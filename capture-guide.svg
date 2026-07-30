@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="980" viewBox="0 0 1400 980">
+  <rect width="1400" height="980" fill="#fbf6e9"/>
+  <defs>
+    <style>
+      .title{font:800 44px Arial,sans-serif;fill:#22180f}
+      .sub{font:600 22px Arial,sans-serif;fill:#675b4c}
+      .card{fill:#fffdf7;stroke:#ded3bd;stroke-width:3;rx:22}
+      .num{font:800 24px Arial,sans-serif;fill:#22180f}
+      .head{font:800 28px Arial,sans-serif;fill:#22180f}
+      .body{font:600 22px Arial,sans-serif;fill:#5f5549}
+      .small{font:600 18px Arial,sans-serif;fill:#736756}
+      .purple{fill:#4b1a67}
+      .yellow{fill:#f7d84a}
+      .ink{fill:#22180f}
+      .line{stroke:#4b1a67;stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+      .dash{stroke:#cfc2a9;stroke-width:3;fill:none;stroke-dasharray:10 9}
+    </style>
+  </defs>
+  <text x="70" y="78" class="title">How to use Capture</text>
+  <text x="70" y="118" class="sub">Do this setup once. After that, capture a profile only when you click your bookmark.</text>
+
+  <rect x="70" y="165" width="380" height="290" class="card"/>
+  <circle cx="115" cy="210" r="24" class="yellow"/>
+  <text x="106" y="219" class="num">1</text>
+  <text x="150" y="219" class="head">Open Capture</text>
+  <rect x="105" y="250" width="285" height="145" fill="#f2ead9" stroke="#ded3bd" stroke-width="2" rx="12"/>
+  <rect x="125" y="278" width="90" height="22" class="ink" rx="5"/>
+  <rect x="125" y="316" width="140" height="18" fill="#d9cdb5" rx="4"/>
+  <rect x="125" y="348" width="118" height="18" class="purple" rx="4"/>
+  <text x="126" y="363" font="700 14px Arial" fill="#f7d84a">Capture</text>
+  <text x="105" y="428" class="body">In the left menu, click Capture.</text>
+
+  <rect x="510" y="165" width="380" height="290" class="card"/>
+  <circle cx="555" cy="210" r="24" class="yellow"/>
+  <text x="546" y="219" class="num">2</text>
+  <text x="590" y="219" class="head">Make the bookmark</text>
+  <rect x="545" y="260" width="285" height="58" class="ink" rx="12"/>
+  <text x="586" y="298" font="800 22px Arial" fill="#f7d84a">Drag to bookmarks bar</text>
+  <path d="M687 330 C687 365 650 370 620 385" class="line"/>
+  <rect x="555" y="392" width="250" height="36" fill="#fff7d2" stroke="#4b1a67" stroke-width="3" rx="8"/>
+  <text x="583" y="416" class="small">Bookmarks bar</text>
+  <text x="545" y="356" class="body">Drag this button to the bar.</text>
+
+  <rect x="950" y="165" width="380" height="290" class="card"/>
+  <circle cx="995" cy="210" r="24" class="yellow"/>
+  <text x="986" y="219" class="num">3</text>
+  <text x="1030" y="219" class="head">If drag fails</text>
+  <rect x="990" y="260" width="300" height="128" fill="#f2ead9" stroke="#ded3bd" stroke-width="2" rx="12"/>
+  <text x="1015" y="294" class="body">1. Copy bookmarklet</text>
+  <text x="1015" y="330" class="body">2. Add new bookmark</text>
+  <text x="1015" y="366" class="body">3. Paste into URL field</text>
+  <text x="990" y="428" class="small">The URL must start with javascript:</text>
+
+  <path d="M452 310 H505" class="line"/>
+  <path d="M892 310 H945" class="line"/>
+
+  <rect x="70" y="535" width="380" height="300" class="card"/>
+  <circle cx="115" cy="580" r="24" class="yellow"/>
+  <text x="106" y="589" class="num">4</text>
+  <text x="150" y="589" class="head">Go to a profile page</text>
+  <rect x="105" y="630" width="300" height="116" fill="#ffffff" stroke="#ded3bd" stroke-width="2" rx="12"/>
+  <circle cx="138" cy="664" r="19" class="purple"/>
+  <rect x="170" y="650" width="150" height="18" fill="#d9cdb5" rx="4"/>
+  <rect x="170" y="684" width="205" height="15" fill="#eee3cb" rx="4"/>
+  <rect x="170" y="710" width="175" height="15" fill="#eee3cb" rx="4"/>
+  <text x="105" y="790" class="body">Select useful text: title, company,</text>
+  <text x="105" y="820" class="body">location, notes, or summary.</text>
+
+  <rect x="510" y="535" width="380" height="300" class="card"/>
+  <circle cx="555" cy="580" r="24" class="yellow"/>
+  <text x="546" y="589" class="num">5</text>
+  <text x="590" y="589" class="head">Click your bookmark</text>
+  <rect x="555" y="638" width="270" height="44" fill="#fff7d2" stroke="#4b1a67" stroke-width="3" rx="9"/>
+  <text x="585" y="667" class="body">Add to Workbench</text>
+  <path d="M690 695 V752" class="line"/>
+  <rect x="575" y="758" width="230" height="46" class="ink" rx="12"/>
+  <text x="606" y="789" font="800 20px Arial" fill="#f7d84a">Capture opens</text>
+  <text x="555" y="835" class="small">Nothing is tracked unless you click it.</text>
+
+  <rect x="950" y="535" width="380" height="300" class="card"/>
+  <circle cx="995" cy="580" r="24" class="yellow"/>
+  <text x="986" y="589" class="num">6</text>
+  <text x="1030" y="589" class="head">Create profile</text>
+  <rect x="990" y="632" width="300" height="135" fill="#ffffff" stroke="#ded3bd" stroke-width="2" rx="12"/>
+  <rect x="1018" y="660" width="190" height="19" fill="#d9cdb5" rx="4"/>
+  <rect x="1018" y="696" width="235" height="15" fill="#eee3cb" rx="4"/>
+  <rect x="1100" y="725" width="150" height="36" class="ink" rx="9"/>
+  <text x="1120" y="749" font="800 16px Arial" fill="#f7d84a">Create profile</text>
+  <text x="990" y="812" class="body">Review it, assign a role, save.</text>
+
+  <path d="M452 685 H505" class="line"/>
+  <path d="M892 685 H945" class="line"/>
+  <rect x="70" y="890" width="1260" height="48" fill="#4b1a67" rx="14"/>
+  <text x="102" y="922" font="800 22px Arial" fill="#f7d84a">Shortcut after setup: Profile page -> select text -> click Add to Workbench bookmark -> Create profile.</text>
+</svg>

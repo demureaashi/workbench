@@ -1,0 +1,9 @@
+{
+  "name": "Superteam Talent Workbench",
+  "short_name": "Talent Workbench",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f1e8",
+  "theme_color": "#f5f1e8",
+  "description": "Offline-first sourcing dashboard for roles, profiles, outreach, follow-ups, and submissions."
+}

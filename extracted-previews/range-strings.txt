@@ -1,0 +1,3678 @@
+*r
+û°
+ð@
+õ.
+è°
+id
+full_name
+first_
+las
+url
+occupation
+company
+posi
+loc
+/\premium
+email
+ phone
+)(origins
+edu
+I8
+current_
+0title
+employm
+7,type
+> 
+ start
+4experience
+Çpabout
+Laszlo Heves
+xSenior Developer at Sky
+* Fullstack
+4è
+#Kensington, England, United Kingdom
+Corvinus
+hversity of Budapest
+m@-time
+&Lond
+Greater 
+:f
+!ñdJun 2019
+Sky â
+ fÍ
+ (
+) | 
+C4 â
+ Present |
+xv
+TAB (The App Business)2
+rontend9N$ - Contrac
+Feb
+May
+6ù
+WeShop®a
+Aug
+nba
+Augmint
+Lead JÁ
+| Ja%y
+bbU
+(Discovery Eq[
+ UK
+d1©z'
+-§
+DGizmodo Media Grou
+Team
+| Oct!5
+|UÀ
+4Hungary
+Gawker
+s.
+-enda4(ineer | Apr
+n.a
+Harrods
+UI]GU¼
+Rb
+@Hogarth Worldwide
+| Nov
+[-
+2f[
+(Bergman SrojU
+I6
+0I6M
+T0
+Machina Design Studi
+Co-Found%2
+-2
+ ¡¡
+Cla
+6HCarnino
+Web3
+á.
+0x
+'M
+2/
+'©
+En)¸
+ '
+!Un
+Ã  degli
+ di Tor
+Ç)»
+23
+Î°Aaron Rodrigues
+WSRE | Cloud & Reliabil¡Z
+ing |%È
+xAd@WS | Kubernetes |½Ý
+Backgr!^
+_A
+Software
+fL
+PeterboroughB
+ÛMH
+,á3PSareh Heidari
+"-
+ns
+F1Â® Arcade
+6!
+UCL
+TerryAÑ
+iá
+2á
+Techië
+@ Log MyA: e
+4á
+nical
+7ÅDE
+5!µHBedford College
+69
+,23
+Ã!
+¼!
+^e,f[
+gå Á«)L
+2i
+F«
+YuLif
+k-iQ/:`
+O^a
+0Neural Alpha 
+Chief
+Ù(ology OfficeÇ©¼
+  In!
+(role as CTO
+.|
+¨, I was deeply engaged in the hands-on tech)ËDstrategy and execu
+ of seve
+Ôhhigh-profile projects, dedi
+Lng approximately 80%
+my 
+p to coding. This included lea
+¬TTrase finance platform
+§$collaborat
+clos
+x4with two other
+S0ers on a critE½
+ for
+i<Baltic Exchange.a
+9 
+ership%X
+instru
+al1V
+d©µ!A
+imple
+1F
+a 
+reh
+8ve index calcul
+e¥Z
+, utiliz
+a sophis
+ee
+à`Typescript, AWS, MongoDB,
+more th
+h Python microservices. Addi
+(ally, I gui!
+!r>
+wo Re
+appl%ì<ons, each specif!P
+ly-
+ed !S@Freight Assessors
+-e<panel members.
+Lof four direct reporAl I champio
+e a culture
+excelleA#
+that%¤
+evid
+in 
+MÑ!Pto maintain zero downE£!ºxconsistently meet 5-minute SLAs%~mF
+deman
+%Å al window
+6am
+6pm.
+ThÅ
+oute
+enure,
+$dual focus
+onq
+ic 
+s%F
+actA:
+code
+tribe¥
+, ensuÅñ
+èE´
+sol
+"Ts were not only innova
+N(but also inE¢$lete alignA¿
+missio
+resp!&
+ble capia
+managEòe8
+A)
+Á.D
+pivo
+<A
+.Æ
+'sAô
+tus
+a %ù
+forcaEE±
+.ú
+ector.J
+øBÊ
+e1:
+  As ab8
+a=
+worke¡7
+tiÞ
+ly)9
+a d
+e2
+E¦
+s JavaSeÏ
+/yÚ
+ (mai!¯e~
+),mÊp, multiple databases (SQL, No
+Graph
+!|
+Tr
+Stores)
+a r
+êA¬
+ (such!s
+Lambda, SQS, SNS, API Gateway). II;
+ÿ¥y4pub/sub messag!Ñ
+APIs,]±
+nga
+4various facets
+U¼
+ infra¡d
+caã
+DIâ
+tÁ<
+od%z
+as aA
+toÅì
+eå
+tisQ".
+ ies, buileº
+scal
+@y+!.
+enhanc
+« he robust
+¨.
+Eñ
+eff
+ g
+ly
+ed
+st
+perÁÈÅÕ
+of
+produåT
+sete
+geAð
+ furÅÒ
+growth
+FqÉ
+on.
+myda
+TO:Î
+TDec 2020 | Milton Keyn!
+6?
+Blue
+¡£
+ SEÁ
+Dé«
+| 
+iC
+ÍbE
+1Ì.\
+ÁF¥
+ee!
+an ag
+Ñ#
+4iEM~
+ite¡
+ve>Ç
+aEà
+er monit
+g1r
+cá8aU  centre b
+ . Recogni
+neÍè$a revampedA
+spearheañU
+architeEÎ!ñ
+a new 
+availM
+alised.«
+Q 
+ l
+eZ
+Node.jéY:ß
+I}
+be fuá 
+penå
+horizont
+aÖ"¿
+ed rele
+ies !
+pg Sinopia (NPM), Git, Jenkins
+_ GitLab CI%`
+auto
+di}
+,syntax check
+:s
+McÅ
+MÅa¡¦
+Uz(| Sri Lanka
+MJ
+ AÕ
+Chip'sÝ´
+i!»
+took%ä
+op
+un
+Áä
+l2f
+nsite,A
+¥è$I had beenqøAÑ
+remo
+si
+2009. BEì
+E$ addressed
+ges!
+to
+-zoneI
+E7
+re
+ici
+commu¡V
+%x
+st
+.)h
+15 
+-Tåúa
+devy
+any'
+%¸M7
+2013
+2014>î
+LAMP -ø
+e!î
+Jul%
+[5û:[
+a íÖ6?
+!ÍÁ!
+tasá
+¡Ð
+e*«
+haula
+"Itheon"!Ï
+s-"
+too
+b)
+SNMP-á
+d%'
+My dutaCåy
+m,m User Interá
+m»%'
+rapid
+totyp!
+$to bug fix
+aÅÉ«
+e!m
+nt par"H
+Ü.ã
+!"
+outsourc
+1UÞ
+, wh
+I l
+n-
+Eî
+$d trainingiüeD
+hi
+process
+e)
+XPuser-friendly xHTML /*
+7%
+!§2Ï
+ee
+È(well receiv
+y custom
+!,
+top}ö(.
+SecureHosån
+LTDå@E
+ Ampthill,ÑÑ shire
+dGabriel Muraoka
+KWeb2E
+.Ne
+AngulaAÚ
+>K
+tat Viagens Abreu, S.A.
+¹¸
+Lisbon Metropolitan Area
+.ISEG - 
+Schooe
+(Economics &
+Ed
+Oeiras, 
+7L, Portugal
+Ma
+,23
+J¾
+%oJ»
+:¿
+&í
+Travel I.T
+b>j
+"O
+423 | RibeirÃ£o
+w to
+Compli
+@SoluÃ§Ãµes Fiscai
+(Partner SucAé-:>Ò
+Fp
+nexia
+Ã§
+Dig
+ S
+Ac
+Sep¡a.î
+18JÍ
+>'
+Cm,
+ SuÅù8 Analyst/System
+ "ó
+oF/
+=$
+VIP
+»FL
+¥á
+16JL
+BRe
+ø!
+>`
+I%
+5JH
+ CÃ¢mara Má
+ipal de>x
+a¥
+EË
+¢J
+Thiago C. S. Ventura
+FulB@
+<Guardian
+"°
+yà<(
+"Greenwichf
+eýJ¤
+Ga·)9,24
+j|
+Markí5
+hFò
+ -
+ (
+m¾iË
+eË
+b$
+101 WayiÆÚ|
+om×
+Zoopl
+þz
+zi
+21
+AmidIïVy
+Jc
+Mi
+m:H
+ElsewheI>ªg
+f©%
+È1Ê:g
+Wait
+j=
+RÎ
+)µ
+17
+rackneé÷
+rkåô>7
+Kurtosys
+ØÂ>
+aMÕ
+)¸
+Vñ
+PBen Igbokwe
+-E2s
+& LineÕ
+@ IBM¡(
+eac
+, CSS, 
+D| UX & SEO Optimiz
+|&*
+& Mento
+Y!
+IBM
+÷:¯
+A@
+"9
+4!
+'>
+ Z
+)ì,20
+ýÁO¢
+::
+Kingfis
+plc2
+ 6»
+|Q 
+RÛ
+Deb
+fÊ
+itm
+yÛ
+ia¿
+Bet.©
+PH6²
+ePIÆ$
+SilverDoo©æ
+ÕÜ
+éÐm
+áÐ
+GZê
+XI"Æ
+r 
+P$on
+Connekt
+:^ 
+0)wÉb
+=Z
+$Global Net
+gr
+Lim
+$$At
+£Á»
+Ed
+"o!
+0)?
+08
+%@Andy Meek
+%m¶
+`AWS
+Skyral
+5v6
+VaA
+#,25
+ÐrR
+6C
+H:7
+ZP
+Dy
+-'
+ek
+o>
+M|)¨y
+Wfü
+Abcam
+(via 
+:¾
+)¤
+24¡%2
+&0
+Camelot Lott
+ñ#
+Í&m
+aè
+Yý2m
+aé
+,21
+DeepCrawl
+5Î
+|Mæ
+;)
+ITV%
+XJÙ
+[-vi+2h
+Ver
+Z&a
+>a
+Consult
+2c
+$Sydney, Au
+ lia
+Qanta2b
+z¾
+)a
+|J[
+Fairfax 
+J%N¿
+Bï
+Iî
+pD| Pyrmont, New Sou
+al
+WiTH
+I!
+áª
+Z;
+Í©Í
+| Su
+Hills,
+Oak
+^-
+|-Ö
+Iò
+ Spindrift.L
+U2à
+S©î
+p!½îBw
+ Tesco PLC.e
+~J
+^d
+hWelwyn Garden City, Herts
+ Is
+Þ)
+j%y2
+6Â
+Iý
+ÇÕeFÇ
+French!
+n!Þ
+Mü
+B)
+mÕ
+(Y9
+0I.í!
+Volodymyr Kozieiev
+#Cloj
+er
+ZÅ
+ç64
+UI
+7$ [Crypto W
+t]
+\&Ñ
+,F{
+4>
+8Kharkov
+w*o+DRadioelectronics, 
+, Uk
+§$
+^Áô)¸,22
+¹E
+Â¶
+:"
+].ù
+.im
+c2
+/C++/Q=M>
+:`
+.Æ
+(21
+Gold GMT
+`EÅ9ú
+[Mob
+visu
+ impaired]6
+Â62
+Lo
+¹ .G
+/QML.Ú
+8/Defibrillator]
+´06
+Quilt-EZ, L6ô
+^.Z
+ draw
+l%m8á³
+jÂ
+E±â
+\(
+Alde
+Ju
+o.
+C++=n
+->
+5E
+Æ.
+Pratik
+,ai
+5MeaÐ
+grity6
+J^
+Tata
+pée
+cy S
+,Visvesvaraya
+K"
+n&
+X&
+luru
+Ér,22
+bq
+E$Jª
+!2$
+  SkÁ¾
+blem
+v!ï
+Â·É
+.ô
+Â·
+G!
+ire
+áI
+Þ"
+ve
+PrB
+REST
+7 WebSocket
+Redux
+SASS
+¶!)i6
+(GUI)
+-õFm½
+Exp
+%µ
+y>(
+HTML
+St
+Q.í
+5¡
+ngE
+$, Karnatak
+}(
+ndiazk
+$-
+ì&Ltreal, Quebec, Canad~q
+ÕÁ©
+LifA.
+i2é
+ré
+gá%8Carlos M. R. Al
+z2
+atID,e IT
+EU
+\0
+*Iscte - Institutoy
+Ã¡ri
+ô"é
+kÁ½
+HKarl Taylor
+/-äa|
+9ð
+olo
+BG
+Westm
+er
+6)
+,24
+ 6¥
+P¥rF%
+206
+m*
+&ekéO
+VÉa
+an
+Qá#!
+);
+S>Y.6r
+]I
+6g
+$:R
+Fu
+ P
+w+©¶
+ Na¥
+Ë3
+é»
+`-r
+SavvyA(
+perty%@
+³º
+éÍ
+½)lB
+Wo
+op
+z>
+Z^
+Imp
+F*
+ÁJÌ
+2[
+2í
+Z[
+Bull!Ðm 
+x+
+_+
+¾!á!I&
+^)t
+Ha
+HÁ°
+Lt
+)·
+Hierre Lejay
+B9L
+inge
+$Blink - EmployeeÁ¸
+Ã7Ua
+[i
+Code
+ó%
+òÍ
+(5
+%HFf
+:+
+\R+
+nPla
+|-
+¢N
+E-
+ |M
+)ñ
+t6Å
+fø
+OMD EMEA%
+ Programma
+/&o%M
+)I
+V¶
+Hearts
+2`
+!%
+Buy
+ç#.E7
+< }t
+ap2S
+Ca
+gn
+¼m
+iÊ
+ ! 
+e:O
+ä+
+ 8
+t c
+/0
+nd 
+cy run
+å"
+ n
+p.4
+Ñ#
+br
+s1
++*
+invo
+ :
+- Draf
+|1
+ng
+plan
+º&
+}%
+riefs
+Ð#
+m cl
+æ%
+s.
+;Z
+t&
+D#
+flight*?.
+H#
+del
+þ.
+s all
+ requir
+0/
+ob
+iv
+KPI
+Con
+Þ*
+mark
+Ú/
+p 
+is
+Ì)
+ins
+Õ-
+:0
+Ô 
+û&°.$ of viewab
+@6
+, qual
+%·
+ safety!U
+cedures
+Æ'
+!y
+Coordi!î
+ng&h&
+s'
+þ-
+te
+AZ
+ll a
+>1
+ý,"r)
+con
+Ê3
+r%
+ud
+ targe
+, pa!*
+,A@
+ä!2È
+prá
+ doc
+à2Áw
+²Yã
+pr
+ü%( postmortem)
+key
+gs
+þ(
+vea;
+onmD
+, displa
+z4
+L&
+o a
+l'E{
+c(
+c"t*
+a vari!
+of
+s.j 
+At
+ Ow
+  R
+bl
+A"
+èu
+É5
+pe
+Ej
+ñ&qî
+Ð&
+d byNh
+to asá³
+0A
+in!P
+du!¶
+ tre
+Z2!g%ó!
+Star!é
+itial
+ce
+¤&
+g+Ií
+d aE
+off
+¦*!^
+?)¹
+UX
+er
+&/%
+scratchA8
+OA
+aw
+Å'
+°aÚ
+et
+ö,
+ify
+r!7
+it af
+à>"×0
+Ä-
+oiö
+Ensu
+Ö*
+aD
+ follow
+method
+ö2!4
+h(
+es
+Es
+<s: Jira, Trello,
+flu
+w"
+OystÅY
+¿>*Ø
+U>
+"Ê
+vÀ
+Ubiso
+¶%
+Cert
+¢)eZ*»%
+AE
+ñÛ
+Paris6º
+Region
+(SaaS)
+m#
+#No
+Reá!
+.1A
+ |
+$f
+Quizzi
+RK
+6M
+zW
+HIvan  Zarro
+lRe
+Lat DINEFER Masterâ
+gre
+P2
+Infor
+on.Á
+from
+Su
+Hor TÃ©cnico
+&Ë
+F#
+T)
+26
+Lucas 
+ ¥
+Google 
+ FacÁÕ
+in 
+Ë(
+uaw
+| &
+ Ambassado
+=EQ
+vOp
+C=
+UI/UX
+Qã
+ý(
+iéS¡_
+6>4
+IRIS | I
+6ÍÝ
+Lab
+"Re
+:eÖ
+IT
+éK
+Fed
+§:6m
+ Ceara
+$1K
+Ï 
+!7
+Ç v
+EÖ
+%]
+¯B6´
+.¡jé¹¥ñ
+±2
+ec
+D*
+m:
+µ.(Civil House¡Â¡
+¼.
+¨7
+of
+Ã¡.- I
+lifecycl
+B-
+ea
+s,I¿
+coÅ<!
+P5
+organi
+v8
+vi
+Ü.
+.d.
+am
+of
+un
+©0
+:/
+ rule
+1D$.
+BilÃ
+ngu
+T'*´
+6B
+ QuixadÃ¡,-G$, Brasil
+I¨q8
+ä2
+IT
+er /
+S605
+q:
+"}
+6vE FortalezaB
+  I
+M6
+^/!`
+±7
+s6q
+!3
+, du
+my
+nce,
+Ù1
+pro
+¬6
+Û=
+.EÄ
+Ê0
+w!
+lyA½
+di
+trans
+QE91
+Chief).
+tisåù
+gra
+ FUNCAP CE
+e"¨
+nu0
+ed
+$5
+ct"
+te
+gy
+A)M
+.Q
+,SEDUC, Ã
+RIS
+sai\$, Sefaz-CE
+ Dea
+eº
+ofM
+n.ä
+!K
+us!CqÕ
+like
+JS,
+, Sp
+, &
+D©Wyz%?
+ù5
+sa@
+ly
+p2
+Î?
+)Ò)5!
+Secretar
+MÈ
+,©[
+Hig
+&Ù
+Å6
+e.
+Ü"
+pus 
+Embaa8
+or LÃ
+de
+{?
+¹.
+ (Seas
+VF
+ì(
+ä.
+Pau
+mv
+¶k
+Nj
+4e`íM
+I&Jj
+Ñ<
+dade ÑQ
+do-ô
+Profe
+Ð>
+ente (
+!m
+omÜ
+bU
+rß
+d2C
+2Ø
+iJØ
+Samsung.o
+v)¹
+ploy
+¿)jk
+Bk
+az¡"rØ
+o"
+&4
+2í@ÍIÅ1
+¸>
+¡kYÔ
+Åa/õT
+T6Ã
+teamÅ
+im
+ÇA
+edÉ
+í/aq
+web .
+<mý6b
+state
+Nex
+ij
+Ant
+wå
+7(
+legacy s
+pop
+TB
+.-1e
+¾.õ
+ºÆ
+2è
+¡³
+fram
+:bî
+ParseJs
+ among
+°C
+!©
+Ã@
+ex
+ng¦
+Maith
+S/J`
+FDTE
+nd
+c2
+o!Õ
+i!
+o¡c,nolÃ³gico da
+ria
+Bol
+V:
+ Inici
+hC
+ (Part"¬
+Z¥
+&y
+i"
+preneuZù
+0¥5vX
+6Ø
+ov
+re
+<<dorismo  [ Volun
+@] - PIBI PROINTER:ÿ
+-¤
+§"Î
+|Bm
+C¡«
+lha¡À
+ù.
+íDB)
+- CE (C*Û
+-t
+B²
+JÛ
+!½
+icipaÁ:
+da 8Âª
+û+
+c-
+2á
+|N
+DeM
+!l
+{*RÃ
+yé
+ÑÃ
+Br©ón
+ ups Incub
+&å
+ÍÐ
+5J6j
+  
+4±µ
+Corrid
+YF
+2;%å
+Û%
+net
+award
+¤B
+arried 
+¥E
+ia
+J,
+BB+
+$(SECITECE)
+)/
+ian 
+t#
+k7
+to M
+¡G
+Sm
+pri
+ßC
+EBRAE),
+stu
+Ä?
+ai
+gF"
+ir
+as ,"
+venÉM
+or pre-
+al&T
+int
+Fa§
+»C
+mpeti
+3C!;
+soci
++&
+models.
+6i
+i×
+4¹
+(giÃ£o
+Socie
+¦:
+mf
+- SB
+:*
+Von
+2ã
+|Y
+ÕM
+Muh
+(d Tumi
+|B
+qD
+ap
+Õ~
+E&Î
+*e¦
+B,
+ÝI
+¥P
+de
+ex
+ã$
+¯$
+HkS -
+Aú
+¥0
+ly 
+ÌQ
+UI! "1U
+|:£
+aÃ
+Manche
+»*
+³*Si
+suî
+Ind
+ã-
+"Á
+¡Ä
+)5
+Ú5
+55[2ñ
+íHIråHz\
+ns
+ACeGe
+is
+of
+figure5
+ô2
+.)
+%r
+¨%
+am
+n¹
+îµ
+)µ6$
+0zó
+GE®
+: E
+ I
+¡G
+áxMÙA
+a=
+ex, sc
+|N
+e"¸
+ÅÀ:~
+JS. 
+¢%Z
+/(
+InÉöE·
+2Å
+÷H
+('
+þ6
+ä& (
+, al
+knowledg¥È
+mod
+N!åS
+]&
+Webpack
+Babel.
+Solid &
+R!
+U¶
+ÁÄ!H
+%>
+QL1I
+&*
+a4
+Scrum,
+5A
+as6Ñ
+RT
+be
+ÐB
+Viewdec
+Æ1*.
+ñ¹:n
+|Y©
+G6x
+:±%I
+Or
+TÁß
+takehol
+&1'
+erAo&
+s. $1.3b
+venue
+) 
+doc*
+&áz
+!±
+an Az
+R.S
+gath
+áL
+in g
+A6
+A&vO
+ Mi
+6D
+StrA
+Co
+ÎUô
+Ex
+t writte
+ver
+66
+se'
+,IV
+toa³
+la
+"e
+non-
+=o-=
+&+
+-So
+¨+q
+a"$
+plex
+æ+
+an ef
+ÛF
+»O
+¬O
+Q"
+FDM*åX
+Busi
+¹K
+ë)á3©ë
+Lee
+BN
+Õ!
+Exams:a½ 
+PRINCE2 
+¤W)í
+áRA1
+an
+fF
+f Á
+!Y
+Princ
+mes
+ö[
+M1
+aß
+v:Þ
+"VS
+y"V!
+öL-
+ll
+2Ú!ñ$
+H!c"Ñ
+cas2f
+EÃ
+Eb
+VBA,
+Ï(ver, Aggreg
+ð4
+IfA+
+Ò,s, V-Lookups
+9Q1
+ë"
+`K
+ö 
+o#
+$"¡
+¥D
+MS!
+V,Visio, risk 9v
++&@L
+cos
+ess;
+ Mi
+9R
+´'E
+er 
+à$
+,F
+d"
+Ô3
+!»
+ÑO$. 
+YouTub
+eb
+îJ
+ñ"
+ûH
+Arabic 
+Ï'
+lis
+ëS
+n"
+¹S
+Podcast
+I0
+ews)O
+øP
+gues!Û%dAù
+purpo
+[`
+ur 
+care
+´G
+lifesty
+*M
+and Spo
+h 
+DWF
+Para
+l |
+=x&
+J|
+"M8M
+eeø
+   
+litig
+a,
+load
+$I
+ÙO
+6%
+inim
+P)ÌEN!´
+ee%Î
+&3
+å#
+S$fee earnere
+1Ý
+$o-defendan
+nd claim
+t 
+solicAÚ-Ã
+relev
+updat!ó
+üÉö
+bund!
+LA
+ca
+ord
+pr
+e¥
++Z
+dAÝ
+VÍ:
+  & '
+ofõ
+counselE
+Ï3
+pr
+õX
+vN
+mad
+e@
+mp!
+ 9±
+. 
+E"[
+d5á
+way)*
+s 
+ÿ[
+valu
+|"!@
+/#
+t to
+Eí)w
+'sÁÜ
+al=þ5¬
+To
+se
+te
+´L
+s ac!@!Ç
+to
+ir 
+ I
+urge
+im
+ªN
+î,
+dsmith
+m*
+.*
+!.
+B=
+A.
+aÖ2c
+&ê
+m~L
+))A
+±È
+enviro
+SCRUM
+*µB
+UML
+: Clas
+s, Act
+y D
+%Y
+5U
+iQü
+pr&
+de
+!§
+ontinu
+La¾
+ing:
+ly kee
+up!ûa|
+Ô¡D
+st t
+%&
+s,2p
+é$
+*~
+«]
+L[
+V5
+col
+cross-&
+×[!
+A'
+er
+$\
+ý 
+A¯ñÀéZ
+"*õ
+)!ó
+Ì$$.
+MS-Legal!
+Rad
+2÷
+ju/*
+(:ó
+d:
+Re
+s: agre
+EØ
+ !
+, d
+gI»!!
+W+Áã
+N¡"
+}+!>
+?1
+Due dili
+é>
+ommer
+IÍ
+looåÁ
+av
+H8
+rol
+ÒQ
+z'>ë
+am
+ÙT
+ter!ö
+conf
+§!
+clusiT5"
+¡N
+b:
+ Law
+N!Ò)ç
+Adviso
+1.ó
+%Êr
+p-u
+)¾AF
+issue
+fin
+¡¯
+oMs)-
+g-
+ÔZ
+ing)
+ad
+ le
+/á¶-¶
+lawÉ}
+s¡F
+misr
+Õ(&i
+ea~
+off
+B"Ë
+6Þ
+(example: reE?
+~* re-negoti
+b_
+deal
+op
+."!>!
+.{
+ã1
+ivÍ
+W- of harass
+crim
+Y-
+onõ
+t ¡ó
+â¥û
+break
+Ù]E¦
+t/
+, 
+?]
+nal/ACAS2
+Imm
+iô
+ú".h
+ m
+of
+rop
+A=4as e.g. Tier 4EB
+¹NÜ
+ne
+8P
+20
+:Ç
+each
+Rubia D.V.
+Ú+
+Ê:
+åü2[H,
+Ken
+Wd
+my
+A'
+3M
+·=
+4Alunos no Curs
+Sta&þ)!Ç
+Rn
+ aûÊj
+Îj(
+Praxis Nar
+¸W"Ã/
+jÉ'
+21
+3-
+ö/
+Ä-
+.c
+Æ]
+ÅØ
+WA6!Û.H.6æ
+in estab
+r%
+eadl
+o-
+ref
+/K
+¿a
+D^
+ì`
+ç`
+cy
+co
+éU
+*|/
+ö-Å
+-.#
+I|
+ac
+s,"h
+y/A¹
+,a7%
+¢X
+öB
+"é 9D)
+%9
+Þ%
+alÅ
+[&
+re
+ÃV
+s.Væ
+^-
+A¿
+Roteiro:l
+í4U
+.s
+i*
+,"Ö
+|0
+in-dept&
+(&c
+.D
+-Ö*±
+clu
+or
+=!i
+the
+[2
+. O
+µ)I±
+p[
+hesiz
+&¸'
+to
+A¯
+x0"
+on:-b
+Ð/å
+è4
+, hel
+Y«"
+` , dialogu
+Á(
+cid
+plot.
+uggesEÆ
+p!Aè
+he
+Ka2
+æZ
+¿EÌ
+*"9d
+cy
+!g
+æ"
+cla
+¥A
+. I
+orr
+Þd
+%µ!Å)
+errors
+¢[
+keÝ&
+adjus
+imá
+!à
+e flow
+efmj
+î,tory.
+Self-e
+or
+InglÃªs
+Ò"
+NegÃ³cio
+ý-
+ú 
+17
+#"i9
+ÄV
+¾.&
+WP/N¥Ô
+Art 
+¹KáÎ
+7'Z| 
+$LATSClubÂ®
+&Ù0VZ
+iÏ
+ý3
+½Zr(
+Wal
+sney
+Res
+âaÁ
+CQ~
+ Pe
+åV
+°!
+i(8Orlando, FlÃ³ri
+Qc
+dos
+dos
+Nuno F
+8Hs ð
+¨â
+» 
+"«Q
+|å
+ é
+|*oZ
+Vu
+$| ð
+± Flu
+Û)
+®D"r
+En
+ém
+#l
+áÌ
+BNP!
+ibas!
+¤i
+(HN
+s)
+QA
+nYI
+%³º
+rEì
+T 
+&Sq
+í¥
+?.ß
+$0
+c Noma
+Ûp
+-Â5
+i&
+22
+A§
+&.T
+f¡
+Mµ
+|-
+ê[
+Po
+nN:
+Dmt
+\9à
+62
+/Y)²NP
+2c
+PaÄRP
+Christop
+Î,$Berard
+4Sr
+Ûc
+act 
+Ï@
+/%)
+-I«9)
+at 
+Â!4er.ai
+>=
+Fî
+(Alabama
+"8
+Winsome Y.
+ÑBF
+at
+AN
+A H
+¡\
+Cu
+m$t Birkbeck
+ÇQ
+ a
+sAz
+üQy
+÷7Á
+of
+"!
+AZ
+Julio
+÷R
+nFá
+9}
+K"
+<+
+á"
+¡h
+þh
+de
+IG
+j+
+Jest, D
+ò 
+Tolq
+Cumm
+Georgi&9[
+X0
+Am
+Á"
+damEÕ
+yZ1
+6å
+<.u
+!Ê2j
+Co
+W9Ä9C6Y
+í"
+f(| Cabedelo,¡Ü
+aÃ
+ba
+ú2
+Ø-
+Up
+Back
+[#
+^:y
+Indr
+Biô
+Jo
+esso
+Divin
+K+
+§Åï
+Js/E
+È7
+5¡
+(21
+LIV SaÃº
+ v
+uB
+z:[
+º"Ò(
+M0%Z
+µ=Z
+Freel
+r:c
+)!
+| Sob
+ÿ5
+dLzil
+Henrique
+al=Ü
+eáÅ
+^Áë
+®aA
+Devo
+7/
+SME
+@&
+Trib
+FD
+ad
+ÜH
+Su
+Ø"
+or
+En"
+äH( (ISEL)
+-`
+Lais Rhi
+sÉ
+*uèY½
+B!
+ìb
+&Volksw
+V4íé
+Tira
+es-
+ÅÀAÓ
+ortu
+Fc
+e«YJ
+ð6
+`:d
+Be&ôv!ÿ2ñ
+] - Minsait
+<dra) - IGFEJ (Ju
+Èrá$
+Á>
+ñe
+men
+ë+
+µ**
+vh
+áî
+te
+}9
+:2
+Ope
+Þ3
+fÕD
+Ò5
+Ñ5
+boot, NX
+T6
+sa
+, Ora
+o9
+DB.RC
+!¡Bm
+- Mo
+um-Vizá
+}5
+¹I
+hort
+which
+®g!
+È?
+ork
+q2
+ many
+"Î
+, DB2Ôl
+, back
+û&
+[.T
+How
+¦1
+ý-
+i;8he biopharmaceu
+Ru
+l i
+T*
+W;2
+2'
+Typ"g
+Vue 2,
+3, Tail
+îs
+'_
+end
+,Single-SPA, 
+Gl
+ t
+de
+tsyal
+e, Vit
+&3
+st
+s. I
+çta
+t e"À
+ du
+ñ9
+(A
+!ê
+_>9A
+Mosa
+¸|
+Mo
+T1Y>ê
+N)
+Éê
+1¡N
+aceiÃ³,
+goasÅ
+Áé(INNOVATE TI
+}-Aý
+9íV»
+Zl
+&·/
+e1
+Â8
+[.
+do 
+ÁV
+Al
+giÃ¡
+obÃ³A&
+ter
+ß7
+Å8
+º¡§L
+Matthew Wilson
+ùeÑk
+þu!£
+pp1sa·
+·0
+^8
+cu
+mP
+so2úk]
+ia
+.R
+áÄ
+s.
+¼ÁýL
+autarc (YC S24)
+áþ%À:-
+æ@
+Sheffield Hallam
+:^
+ZZ
+d&
+ba
+dom
+Sy
+eJ
+è 
+]f¾B.a
+of
+Fo
+6e×
+|Ñ×
+J9
+3¡!
+W!µ
+ en
+<"
+as
+5ß
+ã)1ú
+s si
+ÁE
+à"
+-,
+a 
+-s"
+ who
+on en
+$AÄ
+2V
+.R:
+A*ö*
+5¨
+32D
+:[EN
+Í7-v
+Âi
+³F
+TAL
+>©
+¡&IMVª
+>n
+verpoo
+0reet
+Alloga U
+Web/.`
+De
+Cp1;
+''
+IPW:
+M"¤
+ic
+er
+ÀaéD
+FÃ¡bio Santos
+Amado
+5ISTEC
+U.3
+ Te
+^9Logias AvanÃ§adas
+a&-4
+¶n
+17
+9Á³
+ó94
+|-z
+sbVp
+McDonald'É}
+j'
+-o
+¬"
+¯=
+o!b
+nde
+Ã§
+O@
+.AbÙRéOÁ=
+pr 2
+ÜQ
+iB
+s Ved
+Òo
+Estil
+vr
+Unipe
+l Ld©H
+IT6b
+ÿ^
+bah6Ú
+.è
+óF$N Vegi
+ÈA
+$C*P"
+ (i[
+ b
+ing)
+[AMS T
+Smore
+Man
+v}
+Slenium
+«,
+E5þ 
+j 
+)â
+èY
+2Ò
+(T
+NODE Js[Aû
+STACK]
+ó0
+ô0
+ïx
+  &
+%Å!Ð
+ EQð
+²©
+$, UK Wide
+.`$)T
+pp
+S$[Dev Opps]
+- Fi,Ban
+ò$
+,Insur
+,ITen
+qº
+Ì!â
+0l Rosendo
+¡,!
+@Cat
+8q ingIt
+ÎA¥
+ IT
+åÅ
+er^L
+Þ7
+(All_
+.(
+%Cz|
+:[
+=-*
+Ób
+d"Ë
+Mr. 
+¨ybC
+(Õu
+ilF)b
+y2 AG
+b¡O
+Á+e
+t:m
+)W
+Fabre
+è%
+Aü
+gA³>Y
+0Nb
+Predo
+C>
+Azui
+>r6D>
+IÍ
+¯¡
+Eric
+ÔA!
+µr$Afonso
+)IT &"`
+Eª
+-Ó
+ÖAÑ 
+SUMA
+9þa,66
+Si
+F§
+AtlÃ¢n
+{%kvw
+:Ø
+ Falc
+e>¼
+¾V
+Ry
+êl
+-3
+AÃ"I
+mk
+n>J
+Android.U
+6Ó
+*}
+TutorA
+En
+å1í`
+M=
+19
+Ü!q
+Kha
+±8 Hersi
+KLD 
+*K
+Bru
+©f
+e)ï1Ija
+:Å
+í(
+&³
+t  
+¾M
+à|
+[5
+ic.
+ò$¡
+×U
+ia
+inE
+ck
+ýa=
+. W
+ÛD
+Ö+
+åd .js, .NET
+fJ
+se
+2CV
+AX
+p;
+¶6
+õ"a
+*@
+ My
+C%
+s5
+e d
+N1
+ng&>*
+Ó$
+÷&
+bespok*Î-
+ tailo
+ßS
+*+
+ indivi
+Ö#
+mm
+¹8
+p*
+Î8
+¼L
+ü@
+^3
+Þ=¹
+ý#
+³Y
+$!Æ
+,.
+cu
+Î;
+&"+
+{T!
+%å
+6U]
+ûS
+'~&
+eeú
+Dr
+ÿ%"3,)õE9
+f%ø
+þ6õ
+Del
+zí
+=è)D-ï
+0X
+¶,
+t-l
+"Õ
+Ð'
+&C
+-scalA[
+fåÎ
+%a
+e-
+Û,
+rA;
+[H
+3y
+tv broa
+Æ6
+`7
+^d
+IoT.
+ª8
+y!ï
+go
+j%
+expaC
+kC
+ach
+lea
+q)
+mp
+EC$ors behind
+¥8
+P0
+O5Þ
+ev
+re
+f:
+s.
+D&Q
+sul
+E`
+"ñ
+ull
++Á
+ 3
+  GOVUK:
+é&
+ zant
+zX
+Ñ%P
+>'
+di¦
+%Ã
+ì(
+l:a
+aÎ
+of
+ns
+wh
+d9@
+of
+p)
+UI
+6(¡¯
+I;
+g¡,
+ 0
+©¿
+dep
+®%
+)¢1:
+r.
+%IÅ
+A~
+'Ca
+i;
+l}
+' &¦3
+ity
+h@
+ & >Åp
+À)¡±
+!-
+o!~
+as
+ÿEá@
+gÁ
+À2
+website
+½Y
+seamless
+Ê4
+m!f
+:Za
+by
+È(
+l%o
+#&"
+fac
+Ö*
+ro
+U2
+&?
+CQ
+!bí
+En
+ß&6
+22 &
+aa¯B+
+Â·1©5
+g5
+a&»
+s u
+å»
+üQ
+ Boot
+Â·
+;.
+;!3
+íN
+QA
+Æ*
+[Ù¬
+is 
+R.2Ý
+me
+%].K0
+ T
+Ö@A
+eer-
+ú*
+e[
+code
+8$Encourage 6
+!Á&#3
+Uù
+.å&ª
+.b
+½?
+eeVc
+:÷J
+12 W
+vA{
+nsá4
+Coe?!è
+&Ð
+lf
+&Ñ
+:3
+act½£
+r¥
+½L
+d.¨
+&³
+mÙeÿ
+'Ja
+,a
+~?
+ion'
+edEû
+§%
+HTM
+YE!
+ÜAØ
+#.
+ aA_
+on
+Õ0
+ "g
+2¹
+i Meticulou
+69
+t8
+ã3Eµ
+!3
+aÁG
+åt
+NEAù
+ýpAÍ
+ea
+FÅ
+2Q
+ *21
+®`
+intu
+6K
+ nav
+ve lay
+Incorpor¥R2
+ad
+°1
+!4
+t pA!
+Áó
+a d
+6y
+ic
+Ûa¤
+tri
+5_
+ce
+lo
+²[
+crui
+V.
+ &ß*
+Priv
+:=
+2q
+f:
+²E
+U0
+ed Sh
+Jv
+Sched"ëY
+ÌQ
+@X
+26 s
+ity
+^:
+Ã{!´
+éý
+d)#
+al
+ÏuM=
+BR
+, ta%
+gZ2s=
+ø>
+AT
+P/a"
+D8
+RE
+all
+Ï=
+gen
+Ï\
+public
+Maximil
+GN
+Hale
+Ë^
+st
+ÕÚ
+& Co-f
+AI Se
+ôw
+s&¦
+ur
+` 
+nd
+ó-
+ÕY
+ing
+me
+RF
+¡Éj
+6à
+drew
+24
+Mcbobby Madu
+íÏ
+Gen
+å5
+(RAG¡+
+tD
+6*
+&P
+wK
+!$Golang
+á*!
+Lab
+S%q
+G%«
+-Íõ
+jobs
+KA
+6%I"Ó
+Õ¼
+i-:Á
+May
+ªj
+ull-
+Í!I*
+9M
+lG!S- 
+.N
+U2
+ve"
+:³
+2ó
+[S
+Nig
+ÃA
+Mi
+E*
+ck^®
+é,
+»H| Ibeju Lekki, Lago
+KnackAp
+æ/
+~-
+Xyp
+(C
+~Q
+f" Enugu
+íA9 
+Tom Felt
+7AnIB
+& 
+=""û
+T.
+API
+ïAÝ
+.ZM
+iäBL
+Northumb
+M#yì
+õ%
+í%
+e%
+¶a
+2B±(ÅcVè
+  *"X
+¢&
+ ex
+à#
+a¡
+"6%
+¡»
+ù8
+a 
+3¢
+r r
+¡¼
+credit
+ke
+ac
+fé
+6%
+volum
+on
+t 
+¤>
+C!
+t2Ò
+:)
+RA
+th
+&1
+* PrÁn
+Qh
+-miå
+- I
+=!
+&#
+ch
+to
+UI
+R6
+f(
+in
+/U
+IM
+à#
+Ï>
+hF
+¸9
+gni
+by
+eader
+!0
+com
+ÞJ
+. O
+MM
+Û>
+ÿ"
+e!
+Ð>!Ö
+G*
+Re
+2C
+7C!x
+lA
+6'
+a.Ò
+pla-s
+evi
+âC
+è>
+ss
+ :!
+ered AI-
+2N`¥
+!U
+pow
+L.Ø
+FA
+Ê,
++8
+½<
+chIE
+deb!
+$*
+accele%Ö
+y pip
+;2
+<-£
+-a
+&?
+show
+/G
+\a
+}f
+y gains
+ly!d
+ú¤
+}7
+-by-
+dom
+ªN
+®`
+:ÁÕ
+key RFCeØ
+ O
+[]6x
+ÎG
+ÛA
+de
+bAÙ
+2|
+9e
+te
+¶H
+haÊ
+endpoi-
+`n
+q3
+eÄ
+Sig"Ï
+focusaü
+å9A«Rñ
+:AÚ
+,ed DORA metr
+Þ.aÊ
+e2;
+W>iÕ.]
+onboar
+"ÛR%m
+!±
+prim
+»@
+(liaison dur>°
+ abs
+}>
+¥¡:
+upg
+A/
+iEE
++Ta
+Is
+ESM "¹A
+n npm
+v}
+Bun
+?qN
+&p
+&!
+r<
+"¸`
+ed mas
+,-¦
+pl
+ßn
+PV
+s: Sp&Z
+]ã
+UX-Ã
+ê!
+°'
+Mer¥
+ Jour
+ß:a
+Dash%æ
+£F
+¦<.Ó
+!È¡#
+ 91%M
+n¡
+loan¡/
+rov
+ËP
+an 83% r
+,½V-Íe
+(drop
+17 
+¡e·
+ 3
+)E8
+s_
+ÉO
+,Á;
+Eg
+ep
+2.
+òZ!#9ù
+¥s
+,in six weeksáê
+jo
+öL
+/Õ@A
+. In
+!.
+scaÉY
+h6w
+8!Km]%*!¸
+or
+6h
+Â-
+&µ/
+ur¡§
+im
+) Fibonacci./
+to staá·
+·O
+ur spr
+4¡E
+*"X
+aÅ
+YõVA
+dro
+ïA.Ü
+×D
+ sa
+s: 
+h9
+ty 
+á¥
+sâ
+Æå
+á,
+hat
+MK
+eam .Í
+)+Á
+XK
+a©
+êA(
+own
+)P
+öC
+ynthetic
+at
+0d ~$360/monthAûiU>Þ
+als
+©¤
+q1
+sh
+off ~5Qùi
+CI/CDõ
+mF
+©ñ
+s!
+nge.
+ChBF
+!UM
+tyýJ
+øs
+-m
+ùs
+µ·
+leak
+ÐO
+ö¡
+hird-
+ë09°
+eS
+a f
+áþ
+li
+¹J
+öHÙ
+ri
+A>
+block*à¢
+WAF
+\VA
+(CPU spikes)Aø
+2&¦
+Õ(r
+&Ý&É
+t 
+a¡-9.
+{>
+n%p
+to 
+E¨
+ºT
+Zt!m
+ops
+£RM. by 2 hour
+áv½ 
+%¢
+AÃ
+re-.K
+È¢
+!:
+.D
+g2Ø
+Op¥ß
+te¥
+e!¼
+|¡
+up.]
+!Ç¡
+EhÁv
+chmj
+Ü 
+du
+d¡C
+Fig
+¸@åûF2
+Dmÿ
+³#
+¢5ñúfÝ
+>+Án
+&Ü
+tle*m
+.Î
+¯FzÌ
+Y upon TynejÙ
+Rõ
+A.ét
+ò,
+ø&R|
+Ô1&\
+A|
+Lincol
+|}
+ó.k
+a8
+eráU4CuRAtOR (Challå
+")
+feaR
+x%
+,Ay
+¶5
+Dy
+·S"Ê
+ã^
+AúmGA¿
+Á 
+¡E&h
+Ð"
+2{
+s.j!
+M}
+|1
+'1&
+l2
+¨¸
+k0
+omp.Tt
+R$
+a2#®
+400
+`V
+60Áo
+ff mÅ±
+¿Y
+a&l
+&éI
+Â¬
+ admini
+ÅÉ*ï
+±«
+Linux.kI
+l!
+and
+firew
+virt
+b. LANs.
+VinÃ
+cius
+,o Bulcao
+yª
+þ@
+ JS
+av
+úE
+SQL
+de
+Djang
+bv
+Synchro
+ÕE
+£o
++q:
+Fe
+;u
+do Ri
+f0
+aÓ
+Pa*
+ft
+NÚ
+6S
+ý&Á
+Fu
+al
+I^
+ÙNa
+m]a
+, 
+Aº
+ac
+Û 
+´Z
+sl
+dec
+nL
+;R
+yU
+Áý
+¶$
+-sidiá
+er
+["
+On
+Jj
+ib
+})Åí
+PIS/COFI
+u«,IRPJ e CSLL 
+0§
+ê!
+Yj
+2¨_*
+"Ñni
+of
+×n
+Mw!*
+en
+:/
+-V}
+å 
+ð|
+Â{
+Ý2a<
+e&
+¤x
+))!`
+TAP Air 
+þ-
+ImB_
+#)
+!Ö
+on
+i-
+reusa
+ty
+30%
+*.t
+áÔ
+-3
+!W
+ò?
+in
+çN
+"¡
+"&'
+rul
+2(
+ofe´
+qu
+±4
+c¡L
+.çd"
+*áX
+bæ
+fr
+ã&Ì:ín
+uq
+Co"ïW
+AÔ
+in1³>{
+!û
+pr
+ía
+IÇ
+J.ª
+r}
+FªB
+s (a;
+Ëe
+x 
+IAP
+fix
+set
+ÛP
+n"
+%ÍÖJû
+ilYï
+larg
+Mç
+$QmA
+Ö&
+in]«
+A7
+ÏT¡À
+Uyi
+APBÂ
+[!¼A
+_ 
+UfM
+ªø
+IF
+en2e.
+YE
+Natal&m70
+olam¡3
+Ogunl
+¼¸
+DN#
+Á#
+cworx
+If
+¨"
+\X
+& DX Too
+ûá
+Tr
+S.
+ck
+unty
+>D
+eri
+§g
+IAh
+nd
+])"Jã26Ú
+"r
+ÙÚ
+$Á·
+l:§O
+"Ñ
+ÀJ
+³a
+Mo
+jI
+i&ò9:ù
+Ô 
+n,1ZU
+w!
+c!qa:ÿ
+exc
+g=J.ñ
+c-J
+Eé
+CI1
+[»
+ÿA-@
+Jay Thummar
+";
+, Ex. 
+RL
+ï'
+ /
+Capge
+»6
++¾
+e!
+| NLP
+AVA
+h%
+åª
+ip Mor
+USA
+KPI
+t (
+v;
+ Wembl
+EZ
+¿O
+Fz
+%þfv
+>8 
+E®
+St
+cq
+ *
+'I
+^Û
+Vø
+H&M
+O#
+uXeF
+pursuÁ
+ma
+S1
+s:â
+mL
+47
+R&L
+Vq
+Y/
+2\
+F½
+:¼
+©Ê
+åt"
+, Bð
+$FactoryJet"+&
+Li&ï ÕL:×(6P
+yaÊny
+Spa
+©S
+Ö8éN
+õ"E+
+Ó76s
+s-Ú
+Ma
+Ç 
+Dy
+Rego
+Lu mÅ
+&76
+í¢
+SQL
+ai
+Fem
+Â®
+'W
+ ]
+fo&:
+ !
+UniFECAF
+Q"
+26
+2j
+%-
+r 2
+±}>Ó
+×Q&X?ÙÁiV¡P
+5<
+&>
+Õô
+Û5
+Mõ2ä
+Fu"sy
+Ca
+te Gulb
+Ý$
+k / &ä¬
+* 
+6µ
+-1
+-?
+7*Â>
+TP%<
+Fac
+Ki
+agr
+dv
+ -
+:v
+äiæ
+veæ!Y.v
+Conect
+®ª
+TikTok:a
+Më
+nNa
+A'<
+Seb Haywood
+A6´
+A§
+!R
+èV
+m42
+(w
+&")
+Qu
+6¾
+m»
+%½2
+:2
+U:ë
+SebWeb
+&Q¶]ð>b
+#AÙ)
+g9&£
+ôfp
+¨C
+Cu
+í#I[ÕN
+¡\
+Croc
+aeL:
+aÕ
+ÌM`
+Snob Mon
+z@=4¥[
+1: 
+)>
+Å0~?
+ Squ
+ú=Á+
+×)0
+xV
+Colc
+»vb¨
+ZachEÚ
+pst
+pÍ
+¥(
+Pugpi
+ÍÆ6
+Bath
+aP
+TÍ
+6T
+JP
+R%
+rN
+)*
+8>Í
+V§
+Ab
+R±%
+¢W
+kham
+!p!
+BarAs
+Ä2k
+@b
+BSQUARE
+aÕ
+"h
+> 
+©5
+$Trowbridge
+SU
+uJ
+!£
+Ý.
+ St
+NY
+atfÐ±>?F
+Crew M
+MÃ:
+-$
+r_
+)(
+pÁRrc
+Ag
+Go
+ÅF
+do
+!ïe
+ava
+Ä-
+ (ES6
+| HTMLá³
+\2
+-Å
+ESTful
+| C#
+++
+ÐA
+Y{
+aX(
+Vanaci
+MD&zµ
+/½ðuy
+Î0
+Ironhack
+r%
+>º
+64
+BeAct
+¯.a_F
+:þ
+-áÉ9ñ
+&Ú
+E!ª>»8!h
+-i9
+sta
+r Re
+ve:*
+ìJ:t
+Man
+ÞBð
+±Ñµ
+Jí
+IÃ
+)A
+Cas
+Ø·
+*Ø
+£!
+0 Cardoso
+§]ºU
+Am
+eacA¥
+&EU
+JÃº
+y_
+|E
+áb
+ij
+ÅH
+ &
+0EÝ
+ox
+| 
+åB
+¯±
+!T
+or
+¥AÉ
+0>
+é3
+de"
+an
+Qe
+An
+U,
+uer
+Ö¸
+sil
+B»
+%øb·
+:¾
+)û6!
+!ª
+[¡nÔ
+ÓR
+Y!I
+`)As6{
+Ai
+'26t
+>W
+>y
+Sou
+,9
+La
+:g
+A7
+èZ
+ &©
+W.O
+6|
+Æ¹
+«!r
+z H. Vi
+GF
+]"t
+U2M
+.js
+üh
+AÑ
+Postgre
+ÝÊ
+"?
+Des
+ Facul
+NY
+K%¼!®Ér.³
+>¬
+iVitr
+TLA
+oh
+a:
+åH^

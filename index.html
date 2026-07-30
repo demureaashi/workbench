@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f1e8">
+    <title>Superteam Talent Workbench</title>
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="stylesheet" href="./styles.css?v=14">
+  </head>
+  <body>
+    <div id="app" class="shell drawer-collapsed">
+      <aside class="icon-rail" aria-label="Tools">
+        <button class="brand-mark rail-button" data-view="dashboard" type="button" title="Dashboard">ST</button>
+        <button class="rail-icon active" data-view="dashboard" type="button" title="Dashboard">▦</button>
+        <button class="rail-icon" data-view="search" type="button" title="Profiles">⌕</button>
+        <button class="rail-icon" data-view="roles" type="button" title="Roles">▤</button>
+        <button class="rail-icon" data-view="followups" type="button" title="Follow-ups">↷</button>
+        <button class="rail-icon" data-view="archive" type="button" title="Archive">□</button>
+        <button class="rail-icon" data-view="templates" type="button" title="Templates">✎</button>
+        <button class="rail-icon" data-view="capture" type="button" title="Capture">＋</button>
+      </aside>
+
+      <aside class="rail" aria-label="Workspace">
+        <div class="brand">
+          <div>
+            <strong>Talent Workbench</strong>
+            <span>Superteam sourcing ops</span>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="Primary">
+          <button class="nav-item active" data-view="dashboard" type="button">Dashboard</button>
+          <button class="nav-item" data-view="search" type="button">Profiles</button>
+          <button class="nav-item" data-view="roles" type="button">Roles</button>
+          <button class="nav-item" data-view="followups" type="button">Follow-ups</button>
+          <button class="nav-item" data-view="archive" type="button">Archive</button>
+          <button class="nav-item" data-view="templates" type="button">Templates</button>
+          <button class="nav-item" data-view="capture" type="button">Capture</button>
+        </nav>
+
+        <section class="rail-panel">
+          <h2>This week</h2>
+          <p id="weekFocus">No active roles yet.</p>
+          <button id="quickAddRole" class="quiet-button" type="button">Add role</button>
+        </section>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Superteam Talent</p>
+            <h1 id="viewTitle">Dashboard</h1>
+          </div>
+          <div class="topbar-actions">
+            <label class="search">
+              <span>Search</span>
+              <input id="globalSearch" type="search" placeholder="Name, role, company, skill">
+            </label>
+            <button id="exportData" class="ghost-button" type="button">Export data</button>
+            <label class="ghost-button file-label">
+              Import data
+              <input id="importData" type="file" accept="application/json">
+            </label>
+            <button id="newCandidate" class="primary-button" type="button">New profile</button>
+          </div>
+        </header>
+
+        <section id="captureNotice" class="capture-notice" hidden>
+          <div>
+            <strong>Capture ready</strong>
+            <span id="captureSummary"></span>
+          </div>
+          <button id="reviewCapture" class="secondary-button" type="button">Review</button>
+        </section>
+
+        <section id="viewRoot" class="view-root" aria-live="polite"></section>
+      </main>
+    </div>
+
+    <template id="roleFormTemplate">
+      <form class="form-stack" data-form="role">
+        <div class="form-grid">
+          <label>Role title<input name="title" required placeholder="Founding Engineer"></label>
+          <label>Client / org<input name="client" placeholder="Superteam client"></label>
+          <label>Week<input name="week" type="week"></label>
+          <label>Target profiles<input name="target" type="number" min="1" value="12"></label>
+          <label>Priority
+            <select name="priority">
+              <option>High</option>
+              <option>Medium</option>
+              <option>Low</option>
+            </select>
+          </label>
+          <label>Status
+            <select name="status">
+              <option>Active</option>
+              <option>Paused</option>
+              <option>Filled</option>
+              <option>Closed</option>
+            </select>
+          </label>
+        </div>
+        <label>Must-haves<textarea name="requirements" rows="4" placeholder="Soroban/Rust, Stellar testnet or mainnet deployments, DeFi contracts..."></textarea></label>
+        <label>Search notes<textarea name="notes" rows="3" placeholder="Target companies, communities, exclusions, weekly angle..."></textarea></label>
+        <div class="form-actions">
+          <button class="secondary-button" data-close-modal type="button">Cancel</button>
+          <button class="primary-button" type="submit">Save role</button>
+        </div>
+      </form>
+    </template>
+
+    <template id="candidateFormTemplate">
+      <form class="form-stack" data-form="candidate">
+        <div class="form-grid">
+          <label>Name<input name="name" required placeholder="Candidate name"></label>
+          <label>Role<select name="roleId"></select></label>
+          <label>Current title<input name="title" placeholder="Senior Product Designer"></label>
+          <label>Company<input name="company" placeholder="Current company"></label>
+          <label>Location<input name="location" placeholder="Bangalore / Remote"></label>
+          <label>Stage<select name="stage"></select></label>
+          <label>LinkedIn<input name="linkedin" type="url" placeholder="https://linkedin.com/in/..."></label>
+          <label>Email<input name="email" type="email" placeholder="name@example.com"></label>
+          <label>Phone<input name="phone" placeholder="+91..."></label>
+          <label>Source URL<input name="sourceUrl" type="url" placeholder="Profile page"></label>
+          <label>Last contact<input name="lastContact" type="date"></label>
+          <label>Next follow-up<input name="nextFollowUp" type="date"></label>
+        </div>
+        <label>Resume / profile file<input name="resume" type="file" accept=".pdf,.doc,.docx,.txt,.rtf,application/pdf"></label>
+        <label>Skills and keywords<input name="skills" list="skillSuggestions" placeholder="Soroban, Rust, Stellar, testnet/mainnet, lending contracts"></label>
+        <label>Outreach / conversation notes<textarea name="notes" rows="4" placeholder="What happened, what they care about, objections, availability..."></textarea></label>
+        <label>Dropped out notes<textarea name="dropoutNotes" rows="2" placeholder="Why they dropped, date/context, whether to revisit later..."></textarea></label>
+        <label>Submission remarks<textarea name="remarks" rows="3" placeholder="Why this profile is strong, risks, comp, motivation..."></textarea></label>
+        <div class="form-actions">
+          <button class="secondary-button" data-close-modal type="button">Cancel</button>
+          <button class="primary-button" type="submit">Save profile</button>
+        </div>
+      </form>
+    </template>
+
+    <datalist id="skillSuggestions">
+      <option value="Soroban, Rust, Stellar, testnet/mainnet, lending contracts"></option>
+      <option value="Soroban contracts deployed to Stellar testnet"></option>
+      <option value="Soroban contracts deployed to Stellar mainnet"></option>
+      <option value="Rust smart contracts, audit readiness, security testing"></option>
+      <option value="Stellar ecosystem, DeFi lending, contract monitoring"></option>
+    </datalist>
+
+    <div id="modal" class="modal-shell" hidden>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <header>
+          <h2 id="modalTitle"></h2>
+          <button class="icon-button" data-close-modal type="button" aria-label="Close">x</button>
+        </header>
+        <div id="modalBody"></div>
+      </div>
+    </div>
+
+    <script src="./app.js?v=25" type="module"></script>
+  </body>
+</html>

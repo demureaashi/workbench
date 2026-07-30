@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Capture Setup</title>
+    <style>
+      :root {
+        --ink: #24180f;
+        --paper: #fbf6e9;
+        --panel: #fffdf7;
+        --line: #d9ccb5;
+        --purple: #57237b;
+        --yellow: #f8d94d;
+        font-family: Avenir Next, Avenir, Segoe UI, Verdana, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--paper);
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+        padding: 32px;
+      }
+      main {
+        width: min(900px, 100%);
+        display: grid;
+        gap: 22px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 42px;
+        line-height: 1;
+      }
+      p, li {
+        font-size: 19px;
+        line-height: 1.5;
+        color: #6a5d4d;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 24px;
+        display: grid;
+        gap: 18px;
+      }
+      .bookmark {
+        width: fit-content;
+        min-height: 54px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        padding: 0 22px;
+        background: var(--ink);
+        color: var(--yellow);
+        text-decoration: none;
+        font-weight: 800;
+        font-size: 19px;
+      }
+      ol {
+        margin: 0;
+        padding-left: 24px;
+      }
+      code {
+        display: block;
+        max-height: 150px;
+        overflow: auto;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        padding: 16px;
+        border-radius: 8px;
+        background: #f2ead7;
+      }
+      strong { color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div>
+        <p><strong>Superteam Talent Workbench</strong></p>
+        <h1>Set up profile capture</h1>
+      </div>
+      <section class="card">
+        <p>Do this once. The dark button below becomes your browser bookmark.</p>
+        <a id="bookmark" class="bookmark" href="#">Drag this to bookmarks bar</a>
+        <ol>
+          <li>Press <strong>Cmd + Shift + B</strong> to show Chrome's bookmarks bar.</li>
+          <li>Drag the dark button into that bookmarks bar.</li>
+          <li>Open a LinkedIn/profile page.</li>
+          <li>Select useful text, then click your new bookmark.</li>
+          <li>Your existing Workbench tab will update in the background, and the page will appear in Capture ready for <strong>Create profile</strong>.</li>
+        </ol>
+      </section>
+      <section class="card">
+        <p>If drag does not work, copy this code, press <strong>Cmd + D</strong>, click <strong>Edit</strong>, and replace the bookmark URL with it.</p>
+        <code id="code"></code>
+      </section>
+    </main>
+    <script>
+      const appUrl = new URL("./index.html", location.href).href;
+      const origin = new URL(appUrl).origin;
+      const bookmarklet = "javascript:(function(){var s=String(window.getSelection&&window.getSelection()||'').slice(0,4000);var p={type:'superteam:capture',title:document.title,url:location.href,text:s};var w=window.open('','superteamTalentWorkbenchCapture');if(!w){alert('Open Talent Workbench once, then use Add to Workbench again.');return;}try{if(w.location.href==='about:blank'){w.close();alert('Open Talent Workbench once, then use Add to Workbench again.');return;}}catch(e){}w.postMessage(p,'" + origin + "');})();";
+      document.querySelector("#bookmark").href = bookmarklet;
+      document.querySelector("#code").textContent = bookmarklet;
+    </script>
+  </body>
+</html>
