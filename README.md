@@ -1,11 +1,8 @@
-# Superteam Talent Workbench
+# Talent Workbench
 
-Offline-first sourcing dashboard for weekly roles, profiles, outreach, follow-ups, submissions, remarks, resumes, and capture-from-page workflow.
+Offline-first personal recruiting OS for `talent.akankshaps.com`.
 
-The current workspace is preloaded with:
-- Range Senior Full-Stack Developer (Frontend Focus): 42 longlist profiles + 3 already-in-interview profiles.
-- Range Head of Institutional Sales: 58 longlist profiles + 4 already-in-interview profiles.
-- VeryAI Fullstack Engineer: 150 longlist profiles.
+The shipped app starts with a single empty `Superteam Talent` workspace and stores records, workspace data, and resume blobs in IndexedDB. UI state such as the active workspace, tab, and filters is stored in `localStorage`.
 
 ## Run locally
 
@@ -15,12 +12,30 @@ python3 -m http.server 4174
 
 Open `http://127.0.0.1:4174/`.
 
+## Monorepo migration
+
+The dynamic React/Node/SQLite migration has started alongside the current static app:
+
+```sh
+npm install
+npm run dev:api
+npm run dev:web
+```
+
+- React app: `http://127.0.0.1:5173/`
+- Node API: `http://127.0.0.1:4175/`
+- SQLite file: `data/talent.db` by default, or set `TALENT_DB_PATH`
+
+The React app imports the existing root `styles.css`, so the static app remains the visual reference while features move over.
+
+## Demo seed
+
+No candidate or role mock data is loaded by default. Use the empty-state button or open `http://127.0.0.1:4174/?seed=1` to load demo data into the browser.
+
 ## Capture from webpages
 
-Open the `Capture` tab, copy the bookmarklet, create a browser bookmark, and paste the bookmarklet as the bookmark URL. Keep the Workbench open once. On any profile page, select useful text and click that bookmark. The existing Workbench tab receives the page title, URL, selected text, and visible email clues without opening a new dashboard tab.
+Open the `Capture` tab and copy the bookmarklet. Keep Talent Workbench open once. On any profile page, select useful text and click the bookmarklet; the open Workbench tab receives the page title, URL, selected text, email clues, and LinkedIn URL without opening a new dashboard tab.
 
 ## Data
 
-Data is stored in the browser on this computer. Use `Export` regularly to keep a backup JSON file. `Import` restores the same workspace later.
-
-The original Numbers longlists were converted to `.xlsx` in `converted/` for auditability.
+Use `Export` to download the active workspace, including resume files encoded in JSON. `Import` restores or replaces that workspace in IndexedDB.

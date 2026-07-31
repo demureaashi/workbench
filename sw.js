@@ -1,12 +1,15 @@
-const CACHE_NAME = "superteam-talent-workbench-v26";
+const CACHE_NAME = "talent-workbench-v41";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=14",
-  "./app.js?v=25",
+  "./styles.css?v=41",
+  "./app.js?v=41",
   "./capture-setup.html",
-  "./roleData.js?v=3",
-  "./manifest.webmanifest"
+  "./manifest.webmanifest",
+  "./fonts/Figtree-roman.woff2",
+  "./fonts/Figtree-italic.woff2",
+  "./fonts/Playfair-roman.woff2",
+  "./fonts/Playfair-italic.woff2"
 ];
 
 self.addEventListener("install", (event) => {
@@ -21,23 +24,11 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
-  const requestUrl = new URL(event.request.url);
-  const isAppShell = event.request.mode === "navigate" || requestUrl.pathname.endsWith("/") || requestUrl.pathname.endsWith("/index.html") || requestUrl.pathname.endsWith("/app.js") || requestUrl.pathname.endsWith("/styles.css");
-  if (isAppShell) {
-    event.respondWith(
-      fetch(event.request).then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-        return response;
-      }).catch(() => caches.match(event.request).then((cached) => cached || caches.match("./index.html")))
-    );
-    return;
-  }
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request).then((response) => {
+    fetch(event.request).then((response) => {
       const copy = response.clone();
       caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
       return response;
-    }).catch(() => caches.match("./index.html")))
+    }).catch(() => caches.match(event.request).then((cached) => cached || caches.match("./index.html")))
   );
 });

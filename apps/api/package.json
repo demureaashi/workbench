@@ -1,0 +1,23 @@
+{
+  "name": "@talent/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "build": "esbuild src/server.ts --bundle --platform=node --format=esm --target=node20 --external:better-sqlite3 --outfile=dist/server.js"
+  },
+  "dependencies": {
+    "@talent/db": "0.1.0",
+    "@talent/shared": "0.1.0",
+    "better-sqlite3": "^11.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "esbuild": "^0.21.5",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.4"
+  }
+}
