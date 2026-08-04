@@ -2239,7 +2239,8 @@ function parseCapturePayload(payload, text) {
 
 function buildBookmarklet() {
   const origin = location.origin;
-  const code = `(function(){var s=String(window.getSelection&&window.getSelection()||'').slice(0,4000);var emails=Array.from(document.body.innerText.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,}/ig)).slice(0,5).map(function(m){return m[0]});var linked=location.href.indexOf('linkedin.com')>-1?location.href:'';var w=window.open('','${WINDOW_NAME}');if(!w||w.closed){alert('Open Talent Workbench once, then use Capture again.');return;}try{if(w.location.href==='about:blank'){w.close();alert('Open Talent Workbench once, then use Capture again.');return;}}catch(e){}w.postMessage({type:'talent:capture',title:document.title,url:location.href,selection:s,emailClues:emails,linkedinUrl:linked},'${origin}');})();`;
+  const appUrl = new URL(location.pathname || "/", location.origin).href;
+  const code = `(function(){var s=String(window.getSelection&&window.getSelection()||'').slice(0,4000);var emails=Array.from(document.body.innerText.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,}/ig)).slice(0,5).map(function(m){return m[0]});var linked=location.href.indexOf('linkedin.com')>-1?location.href:'';var p={type:'talent:capture',title:document.title,url:location.href,selection:s,emailClues:emails,linkedinUrl:linked};var q='capture=1&title='+encodeURIComponent(p.title)+'&url='+encodeURIComponent(p.url)+'&text='+encodeURIComponent(p.selection);var w=window.open('','${WINDOW_NAME}');if(!w||w.closed){window.open('${appUrl}?'+q,'${WINDOW_NAME}');return;}try{if(w.location.href==='about:blank'){w.location.href='${appUrl}?'+q;return;}}catch(e){}w.postMessage(p,'${origin}');})();`;
   return `javascript:${code}`;
 }
 
