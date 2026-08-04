@@ -1,9 +1,9 @@
-const CACHE_NAME = "talent-workbench-v48";
+const CACHE_NAME = "talent-workbench-v49";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css?v=48",
-  "./app.js?v=48",
+  "./app.js?v=49",
   "./capture-setup.html",
   "./manifest.webmanifest",
   "./vendor/hello-csv/index.es.js",

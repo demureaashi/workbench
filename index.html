@@ -14,9 +14,17 @@
       <span class="brand-tile">TW</span>
       <span>Loading Talent Workbench...</span>
     </div>
+    <script>
+      window.TALENT_WORKBENCH_CONFIG = window.TALENT_WORKBENCH_CONFIG || {
+        supabaseUrl: "",
+        supabaseAnonKey: "",
+        supabaseStorageBucket: "candidate-files"
+      };
+    </script>
+    <script src="./config.js?v=49"></script>
     <script src="./vendor/xls/xlsx.full.min.js?v=48"></script>
     <script src="./vendor/xlsx/read-excel-file.min.js?v=48"></script>
     <script src="./vendor/xlsx/write-excel-file.min.js?v=48"></script>
-    <script src="./app.js?v=48" type="module"></script>
+    <script src="./app.js?v=49" type="module"></script>
   </body>
 </html>
