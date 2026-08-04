@@ -38,18 +38,33 @@ For a local static preview, temporarily edit `config.js` with the same public va
 git restore config.js
 ```
 
+## Database migrations
+
+For GitHub Actions, store the database connection string as an encrypted repository secret:
+
+```sh
+gh secret set SUPABASE_DB_URL --body "postgresql://postgres.<project-ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres"
+```
+
+Use the Supabase **Session pooler** string, not the direct `db.<project-ref>.supabase.co` string, for GitHub Actions. Supabase direct database connections use IPv6 by default, and GitHub Actions is IPv4-only unless the Supabase IPv4 add-on is enabled.
+
+Run migrations from GitHub:
+
+```sh
+gh workflow run supabase-migrate.yml
+```
+
 ## Supabase setup
 
-1. Open Supabase SQL Editor.
-2. Run `supabase/migrations/0001_talent_workbench.sql`.
-3. Authentication -> Providers -> enable Email.
-4. Authentication -> URL Configuration:
+1. Run the migration workflow, or open Supabase SQL Editor and run `supabase/migrations/0001_talent_workbench.sql`.
+2. Authentication -> Providers -> enable Email.
+3. Authentication -> URL Configuration:
    - Site URL: `https://workbench.akankshaps.com`
    - Redirect URLs:
      - `https://workbench.akankshaps.com/**`
      - `http://127.0.0.1:5173/**`
      - `http://127.0.0.1:4174/**`
-5. Storage -> confirm private bucket `candidate-files` exists.
+4. Storage -> confirm private bucket `candidate-files` exists.
 
 ## Hosting option
 
