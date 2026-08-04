@@ -727,6 +727,7 @@ function renderCapture() {
   const captures = capturesInScope().filter((c) => !c.dismissedAt);
   const selected = captures.find((c) => c.id === selectedCaptureId) || captures[0];
   if (selected && selectedCaptureId !== selected.id) selectedCaptureId = selected.id;
+  const bookmarklet = buildBookmarklet();
   return `
     <div>
       <div class="capture-setup">
@@ -734,8 +735,7 @@ function renderCapture() {
           <div class="capture-setup-title">Command-based capture</div>
           <div class="capture-setup-note">Nothing is recorded until you press the bookmarklet. It sends title, URL, selected text, email clues and LinkedIn URL into this tab - never a new one.</div>
         </div>
-        <span class="tag tag-outline capture-tag">Drag to bookmarks bar</span>
-        <button class="capture-bookmarklet" data-action="copy-bookmarklet" type="button">⌘ Send to Workbench</button>
+        <a class="capture-bookmarklet" href="${escapeAttr(bookmarklet)}" data-action="copy-bookmarklet" draggable="true" title="Drag to bookmarks bar or click to copy">⌘ Send to Workbench</a>
       </div>
       <div class="capture-workbench">
         <section class="capture-inbox">
@@ -1159,6 +1159,7 @@ async function handleClick(event) {
   if (action === "convert-capture") await convertCapture(id);
   if (action === "dismiss-capture") await patchCapture(id, { dismissedAt: new Date().toISOString() });
   if (action === "copy-bookmarklet") {
+    event.preventDefault();
     copyText(buildBookmarklet());
     say("Bookmarklet copied");
   }

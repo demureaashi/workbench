@@ -378,7 +378,9 @@ test("role, candidate, follow-up, archive, template, capture, workspace and impo
 
   await page.getByRole("button", { name: /Capture/ }).click();
   await expect(page.getByText("Command-based capture")).toBeVisible();
-  await expect(page.getByRole("button", { name: "⌘ Send to Workbench" })).toBeVisible();
+  const captureBookmarklet = page.getByRole("link", { name: "⌘ Send to Workbench" });
+  await expect(captureBookmarklet).toBeVisible();
+  await expect(captureBookmarklet).toHaveAttribute("href", /javascript:.*talentWorkbenchCapture/);
   await expect(page.locator(".code-box")).toHaveCount(0);
   await page.evaluate(() => {
     window.postMessage({
