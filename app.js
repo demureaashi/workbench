@@ -161,6 +161,7 @@ let draftRole = null;
 let draftTemplate = null;
 let draftWorkspace = null;
 let transferDialog = null;
+let duplicateNotice = null;
 let selectedCaptureId = "";
 let toastTimer = null;
 
@@ -209,6 +210,7 @@ function render() {
     ${renderTemplateDialog()}
     ${renderWorkspaceDialog()}
     ${renderTransferDialog()}
+    ${renderDuplicateNoticeDialog()}
     ${ui.toast ? `<div class="toast">${escapeHtml(ui.toast)}</div>` : ""}
   `;
   queueMicrotask(mountTransferImporter);
@@ -1006,6 +1008,34 @@ function renderTransferDialog() {
   `;
 }
 
+function renderDuplicateNoticeDialog() {
+  if (!duplicateNotice) return "";
+  const warnings = duplicateNotice.warnings || [];
+  return `
+    <div class="dialog-backdrop" data-action="close-duplicate-notice">
+      <section class="dialog duplicate-dialog" data-dialog>
+        <div class="dialog-title">${escapeHtml(duplicateNotice.title || "Duplicates skipped")}</div>
+        <p class="muted transfer-copy">${escapeHtml(duplicateNotice.message || "LinkedIn profiles must be unique inside a workspace. The existing records were kept and the duplicates were not added.")}</p>
+        <div class="duplicate-list">
+          ${warnings.slice(0, 12).map((warning) => `
+            <div class="duplicate-item">
+              <div>
+                <strong>${escapeHtml(warning.name || "Unnamed candidate")}</strong>
+                <span>${escapeHtml(warning.linkedin || "LinkedIn missing")}</span>
+              </div>
+              <p>${escapeHtml(warning.source || "Already exists in this workspace.")}</p>
+            </div>
+          `).join("")}
+        </div>
+        ${warnings.length > 12 ? `<p class="muted transfer-copy">${warnings.length - 12} more duplicate${warnings.length - 12 === 1 ? "" : "s"} were skipped.</p>` : ""}
+        <div class="dialog-actions">
+          <button class="btn btn-primary" data-action="close-duplicate-notice" type="button">Done</button>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
 async function handleClick(event) {
   const drawer = event.target.closest("[data-drawer], [data-dialog]");
   if (drawer) event.stopPropagation();
@@ -1036,6 +1066,10 @@ async function handleClick(event) {
   if (action === "download-transfer") await exportTabularWorkspace(el.dataset.format);
   if (action === "close-transfer") {
     transferDialog = null;
+    render();
+  }
+  if (action === "close-duplicate-notice") {
+    duplicateNotice = null;
     render();
   }
   if (action === "new-workspace") {
@@ -1233,6 +1267,11 @@ async function saveCandidateForm(form) {
     archivedAt: ARCHIVED_STAGES.includes(stage) ? draftCandidate.archivedAt || today() : draftCandidate.archivedAt || "",
     updatedAt: new Date().toISOString()
   };
+  const duplicate = findDuplicateCandidate(rec, rec.workspaceId, rec.id);
+  if (duplicate && duplicate.reason === "LinkedIn") {
+    say(`Duplicate LinkedIn: ${duplicateCandidateSource(duplicate.candidate)}`);
+    return;
+  }
   state.candidates = state.candidates.some((c) => c.id === rec.id) ? state.candidates.map((c) => c.id === rec.id ? rec : c) : [rec, ...state.candidates];
   draftCandidate = null;
   await saveState();
@@ -1412,6 +1451,11 @@ async function convertCapture(id) {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
+  const duplicate = findDuplicateCandidate(candidate, candidate.workspaceId, candidate.id);
+  if (duplicate && duplicate.reason === "LinkedIn") {
+    say(`Duplicate LinkedIn: ${duplicateCandidateSource(duplicate.candidate)}`);
+    return;
+  }
   state.candidates = [candidate, ...state.candidates];
   state.captures = state.captures.filter((c) => c.id !== id);
   selectedCaptureId = "";
@@ -1863,8 +1907,17 @@ function mountTransferImporter() {
     onComplete: importCandidatesFromHelloCsv,
     onSummaryFinished: () => {
       const completionToast = transferDialog?.completionToast || "";
+      const duplicateWarnings = transferDialog?.duplicateWarnings || [];
       transferDialog = null;
-      if (completionToast) say(completionToast);
+      if (duplicateWarnings.length) {
+        duplicateNotice = {
+          title: "Duplicates skipped",
+          message: "LinkedIn profiles must be unique inside a workspace. The existing records were kept and the duplicate import rows were not added.",
+          warnings: duplicateWarnings
+        };
+        if (completionToast) say(completionToast);
+        render();
+      } else if (completionToast) say(completionToast);
       else render();
     }
   });
@@ -1948,21 +2001,42 @@ async function importCandidatesFromHelloCsv(importerState, onProgress) {
   const sheet = importerState.sheetData.find((item) => item.sheetId === "candidates");
   const rows = (sheet?.rows || []).filter((row) => String(row.name || "").trim());
   const workspaceId = activeWorkspace().id;
+  const seenLinkedins = new Map();
+  const warnings = [];
   let imported = 0;
+  let skipped = 0;
   rows.forEach((row, index) => {
     const candidate = candidateFromImportRow(row, workspaceId);
-    const existingIndex = findExistingCandidateIndex(candidate, workspaceId);
-    if (existingIndex >= 0) {
-      state.candidates[existingIndex] = { ...state.candidates[existingIndex], ...candidate, id: state.candidates[existingIndex].id, files: state.candidates[existingIndex].files || [], updatedAt: new Date().toISOString() };
+    const linkedinKey = canonicalLinkedin(candidate.linkedin);
+    const duplicate = findDuplicateCandidate(candidate, workspaceId);
+    const sameFileRow = linkedinKey ? seenLinkedins.get(linkedinKey) : null;
+    if (linkedinKey && sameFileRow) {
+      skipped += 1;
+      warnings.push({
+        name: candidate.name,
+        linkedin: candidate.linkedin,
+        source: `Duplicate of row ${sameFileRow} in this import. Row ${index + 1} was skipped.`
+      });
+    } else if (duplicate && duplicate.reason === "LinkedIn") {
+      skipped += 1;
+      warnings.push({
+        name: candidate.name,
+        linkedin: candidate.linkedin,
+        source: duplicateCandidateSource(duplicate.candidate)
+      });
     } else {
       state.candidates = [candidate, ...state.candidates];
+      imported += 1;
+      if (linkedinKey) seenLinkedins.set(linkedinKey, index + 1);
     }
-    imported += 1;
     onProgress?.(Math.round((index + 1) / rows.length * 100));
   });
   await saveState();
-  if (transferDialog) transferDialog.completionToast = `${imported} candidate${imported === 1 ? "" : "s"} imported`;
-  return { imported, failed: 0, skipped: 0 };
+  if (transferDialog) {
+    transferDialog.completionToast = `${imported} candidate${imported === 1 ? "" : "s"} imported${skipped ? ` · ${skipped} duplicate${skipped === 1 ? "" : "s"} skipped` : ""}`;
+    transferDialog.duplicateWarnings = warnings;
+  }
+  return { imported, failed: 0, skipped };
 }
 
 function candidateFromImportRow(row, workspaceId) {
@@ -2008,15 +2082,17 @@ function roleIdFromImportRow(row) {
   return exact?.id || "";
 }
 
-function findExistingCandidateIndex(candidate, workspaceId) {
-  const email = normalize(candidate.email);
-  const linkedin = normalize(candidate.linkedin);
-  const nameCompany = `${normalize(candidate.name)}|${normalize(candidate.company)}`;
-  return state.candidates.findIndex((existing) => existing.workspaceId === workspaceId && (
-    (email && normalize(existing.email) === email) ||
-    (linkedin && normalize(existing.linkedin) === linkedin) ||
-    (`${normalize(existing.name)}|${normalize(existing.company)}` === nameCompany)
-  ));
+function findDuplicateCandidate(candidate, workspaceId, excludeId = "") {
+  const linkedin = canonicalLinkedin(candidate.linkedin);
+  if (!linkedin) return null;
+  const existing = state.candidates.find((item) => item.workspaceId === workspaceId && item.id !== excludeId && canonicalLinkedin(item.linkedin) === linkedin);
+  return existing ? { candidate: existing, reason: "LinkedIn" } : null;
+}
+
+function duplicateCandidateSource(candidate) {
+  const role = roleById(candidate.roleId);
+  const added = candidate.createdAt ? formatDate(String(candidate.createdAt).slice(0, 10)) : "unknown date";
+  return `${candidate.name || "Unnamed candidate"} is already in Profiles${role ? ` for ${role.title}` : ""} (${candidate.stage || "Sourced"}, added ${added}).`;
 }
 
 function toBoolean(value) {
@@ -2296,6 +2372,25 @@ function splitList(value) {
 
 function normalize(value) {
   return String(value || "").toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+function canonicalLinkedin(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    const url = new URL(withProtocol);
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    const path = url.pathname.replace(/\/+$/g, "").toLowerCase();
+    if (host === "linkedin.com" || host.endsWith(".linkedin.com")) return `linkedin.com${path}`;
+  } catch {
+    // Fall through to a conservative string normalizer for pasted profile fragments.
+  }
+  return normalize(raw)
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace(/[?#].*$/, "")
+    .replace(/\/+$/g, "");
 }
 
 function escapeHtml(value) {

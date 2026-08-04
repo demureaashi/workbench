@@ -12,6 +12,7 @@ const KNOWN_ACTIONS = [
   "clear-follow-filters",
   "clear-profile-filters",
   "close-drawers",
+  "close-duplicate-notice",
   "close-template",
   "close-transfer",
   "close-workspace",
@@ -484,6 +485,55 @@ test("CSV import uses HelloCSV mapping and saves candidates", async ({ page }) =
   await expect(candidateTitle(page, "HelloCSV Import")).toBeVisible();
   await expect(page.getByText("Recruiting Engineer · Column Labs")).toBeVisible();
   await expect(page.getByText("Toronto, Canada")).toBeVisible();
+});
+
+test("duplicate LinkedIn candidates are blocked in manual entry and CSV import", async ({ page }) => {
+  test.skip(test.info().project.name !== "chromium-desktop", "Importer and drawer duplicate walkthrough is covered once on desktop.");
+  await page.goto("/");
+
+  await page.getByRole("button", { name: /Profiles/ }).click();
+  await page.locator('header button[data-action="new-candidate"]').click();
+  let form = page.locator('form[data-form="candidate"]');
+  await form.locator('input[name="name"]').fill("Manual Duplicate One");
+  await form.locator('input[name="company"]').fill("Unique Labs");
+  await form.locator('input[name="linkedin"]').fill("https://www.linkedin.com/in/manual-duplicate/?trk=profile");
+  await form.locator('button[type="submit"]').click();
+  await expect(page.getByText("Candidate saved")).toBeVisible();
+
+  await page.locator('header button[data-action="new-candidate"]').click();
+  form = page.locator('form[data-form="candidate"]');
+  await form.locator('input[name="name"]').fill("Manual Duplicate Two");
+  await form.locator('input[name="company"]').fill("Other Labs");
+  await form.locator('input[name="linkedin"]').fill("linkedin.com/in/manual-duplicate/");
+  await form.locator('button[type="submit"]').click();
+  await expect(page.getByText("Duplicate LinkedIn: Manual Duplicate One")).toBeVisible();
+  await page.locator('button[data-action="close-drawers"]').first().click();
+  await expect(candidateTitle(page, "Manual Duplicate One")).toBeVisible();
+  await expect(candidateTitle(page, "Manual Duplicate Two")).toHaveCount(0);
+
+  await page.locator('button[data-action="toggle-transfer-menu"][data-menu="import"]').click();
+  await page.locator('button[data-action="open-import"][data-format="csv"]').click();
+  const csv = [
+    "Candidate Name,Company,LinkedIn",
+    "Import Duplicate One,CSV Labs,https://linkedin.com/in/import-duplicate",
+    "Import Duplicate Two,CSV Labs,https://www.linkedin.com/in/import-duplicate/?miniProfile=1"
+  ].join("\n");
+  await page.locator(".hello-csv-frame input[type=file]").setInputFiles({
+    name: "duplicate-linkedin-import.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(csv)
+  });
+
+  await expect(page.locator(".hello-csv-frame")).toContainText("Review and confirm each mapping");
+  await page.getByRole("button", { name: "Confirm" }).click();
+  await expect(page.locator(".hello-csv-frame")).toContainText("Valid (2)");
+  await page.getByRole("button", { name: "Upload" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.locator(".duplicate-dialog")).toContainText("Duplicates skipped");
+  await expect(page.locator(".duplicate-dialog")).toContainText("Duplicate of row 1 in this import. Row 2 was skipped.");
+  await page.locator('button[data-action="close-duplicate-notice"]').click();
+  await expect(candidateTitle(page, "Import Duplicate One")).toBeVisible();
+  await expect(candidateTitle(page, "Import Duplicate Two")).toHaveCount(0);
 });
 
 test("legacy XLS import skips metadata rows and exports imported candidates", async ({ page }) => {

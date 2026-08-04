@@ -1390,6 +1390,46 @@ textarea.input {
   max-height: 260px;
 }
 
+.duplicate-dialog {
+  width: min(560px, 100%);
+}
+
+.duplicate-list {
+  display: grid;
+  gap: 7px;
+  margin-top: 14px;
+}
+
+.duplicate-item {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--color-divider);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: color-mix(in srgb, var(--color-bg) 82%, var(--color-accent-100));
+}
+
+.duplicate-item div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.duplicate-item strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.duplicate-item span,
+.duplicate-item p {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-text) 58%, transparent);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
 .hello-csv-frame {
   --hello-csv-color-primary: var(--color-accent);
   --hello-csv-color-primary-light: var(--color-accent-600);
