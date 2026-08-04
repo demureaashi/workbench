@@ -36,12 +36,17 @@ const PALETTES = {
 };
 
 const XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-const XLSX_IMPORT_MIME_TYPES = [XLSX_MIME, "application/vnd.ms-excel", "application/octet-stream"];
+const XLS_MIME = "application/vnd.ms-excel";
+const EXCEL_IMPORT_LOADERS = [
+  { mimeType: XLSX_MIME, label: "XLSX" },
+  { mimeType: XLS_MIME, label: "XLS" },
+  { mimeType: "application/octet-stream", label: "Excel" }
+];
 const CANDIDATE_SPREADSHEET_COLUMNS = [
-  { id: "name", label: "Name", type: "string", suggestedMappingKeywords: ["candidate", "full name", "person"], validators: [{ validate: "required", error: "Name is required" }] },
-  { id: "title", label: "Title", type: "string", suggestedMappingKeywords: ["job title", "headline", "current title"] },
-  { id: "company", label: "Company", type: "string", suggestedMappingKeywords: ["current company", "employer", "organization"] },
-  { id: "location", label: "Location", type: "string", suggestedMappingKeywords: ["city", "city country", "city, country"] },
+  { id: "name", label: "Name", type: "string", suggestedMappingKeywords: ["candidate", "full name", "full_name", "person"], validators: [{ validate: "required", error: "Name is required" }] },
+  { id: "title", label: "Title", type: "string", suggestedMappingKeywords: ["job title", "headline", "current title", "current_title", "position", "occupation"] },
+  { id: "company", label: "Company", type: "string", suggestedMappingKeywords: ["current company", "current_company", "employer", "organization"] },
+  { id: "location", label: "Location", type: "string", suggestedMappingKeywords: ["city", "city country", "city, country", "current_company_location"] },
   { id: "roleTitle", label: "Role title", type: "string", suggestedMappingKeywords: ["role", "job", "position", "mapped role"] },
   { id: "roleClient", label: "Role client", type: "string", suggestedMappingKeywords: ["client", "role client", "account"] },
   { id: "stage", label: "Stage", type: "enum", suggestedMappingKeywords: ["pipeline stage", "status"], typeArguments: { values: STAGES.map((stage) => ({ label: stage, value: stage })) } },
@@ -50,12 +55,12 @@ const CANDIDATE_SPREADSHEET_COLUMNS = [
   { id: "snoozedUntil", label: "Snoozed until", type: "string", suggestedMappingKeywords: ["wake date", "snooze until"], validators: [{ validate: "regex_matches", regex: /^$|^\d{4}-\d{2}-\d{2}$/, error: "Use YYYY-MM-DD" }] },
   { id: "contactedOn", label: "Contacted on", type: "string", suggestedMappingKeywords: ["contacted again", "contacted date"], validators: [{ validate: "regex_matches", regex: /^$|^\d{4}-\d{2}-\d{2}$/, error: "Use YYYY-MM-DD" }] },
   { id: "touches", label: "Touches", type: "number", suggestedMappingKeywords: ["touch count", "contact count"] },
-  { id: "linkedin", label: "LinkedIn", type: "string", suggestedMappingKeywords: ["linkedin url", "profile"] },
-  { id: "email", label: "Email", type: "string", suggestedMappingKeywords: ["email address"], validators: [{ validate: "email", error: "Use a valid email" }] },
+  { id: "linkedin", label: "LinkedIn", type: "string", suggestedMappingKeywords: ["linkedin url", "linkedin", "profile", "profile url", "url"] },
+  { id: "email", label: "Email", type: "string", suggestedMappingKeywords: ["email address", "email"], validators: [{ validate: "regex_matches", regex: /^$|^[^\s@]+@[^\s@]+\.[^\s@]+$/, error: "Use a valid email" }] },
   { id: "skills", label: "Skills", type: "string", suggestedMappingKeywords: ["skill list", "keywords"] },
   { id: "links", label: "Links", type: "string", suggestedMappingKeywords: ["portfolio", "website", "urls"] },
-  { id: "notes", label: "Notes", type: "string", suggestedMappingKeywords: ["note", "summary"] },
-  { id: "remarks", label: "Remarks", type: "string", suggestedMappingKeywords: ["close reason", "comment"] },
+  { id: "notes", label: "Notes", type: "string", suggestedMappingKeywords: ["note", "summary", "experience", "origins"] },
+  { id: "remarks", label: "Remarks", type: "string", suggestedMappingKeywords: ["close reason", "comment", "about", "education"] },
   { id: "sequence", label: "Sequence", type: "string", suggestedMappingKeywords: ["outreach sequence"] },
   { id: "archived", label: "Archived", type: "boolean", suggestedMappingKeywords: ["archive", "inactive"], typeArguments: { trueLabel: "Yes", falseLabel: "No" } },
   { id: "archivedAt", label: "Archived at", type: "string", suggestedMappingKeywords: ["archive date"], validators: [{ validate: "regex_matches", regex: /^$|^\d{4}-\d{2}-\d{2}$/, error: "Use YYYY-MM-DD" }] },
@@ -304,7 +309,7 @@ function renderTopbar(ws) {
           ${ui.transferMenu === "import" ? `<div class="transfer-menu">
             <label>Import JSON<input class="sr-only" data-action="import-workspace" type="file" accept="application/json,.json"></label>
             <button data-action="open-import" data-format="csv" type="button">Import CSV</button>
-            <button data-action="open-import" data-format="xlsx" type="button">Import XLSX</button>
+            <button data-action="open-import" data-format="xlsx" type="button">Import XLS/XLSX</button>
           </div>` : ""}
         </div>
         <button class="btn btn-primary" data-action="${primary.action}" type="button">${primary.label}</button>
@@ -956,13 +961,13 @@ function renderWorkspaceDialog() {
 
 function renderTransferDialog() {
   if (!transferDialog) return "";
-  const format = transferDialog.format.toUpperCase();
+  const format = transferDialog.mode === "import" && transferDialog.format === "xlsx" ? "XLS/XLSX" : transferDialog.format.toUpperCase();
   if (transferDialog.mode === "import") {
     return `
       <div class="dialog-backdrop" data-action="close-transfer">
         <section class="dialog transfer-dialog" data-dialog>
           <div class="dialog-title">Import ${format}</div>
-          <p class="muted" style="font-size:12.5px;margin-top:-4px">CSV and XLSX imports use HelloCSV for upload, column mapping, validation, preview, and confirmation before records are saved.</p>
+          <p class="muted transfer-copy">CSV and Excel imports use HelloCSV for upload, column mapping, validation, preview, and confirmation before records are saved.</p>
           <div class="hello-csv-frame" id="hello-csv-importer"></div>
           <div class="dialog-actions">
             <button class="btn btn-secondary" data-action="close-transfer" type="button">Cancel</button>
@@ -977,7 +982,7 @@ function renderTransferDialog() {
     <div class="dialog-backdrop" data-action="close-transfer">
       <section class="dialog transfer-dialog" data-dialog>
         <div class="dialog-title">Export ${format}</div>
-        <p class="muted" style="font-size:12.5px;margin-top:-4px">Review the candidate columns before downloading. JSON remains the full Workbench backup with files, roles, templates and captures.</p>
+        <p class="muted transfer-copy">Review the candidate columns before downloading. JSON remains the full Workbench backup with files, roles, templates and captures.</p>
         <div class="transfer-summary">
           <div><b class="num">${rows.length}</b><span>candidates</span></div>
           <div><b class="num">${columns.length}</b><span>columns</span></div>
@@ -1853,7 +1858,7 @@ function mountTransferImporter() {
     csvDownloadMode: "label",
     preventUploadOnValidationErrors: true,
     allowManualDataEntry: true,
-    customFileLoaders: transferDialog.format === "xlsx" ? xlsxFileLoaders() : [],
+    customFileLoaders: transferDialog.format === "xlsx" ? excelFileLoaders() : [],
     customSuggestedMapper: suggestCandidateColumnMappings,
     onComplete: importCandidatesFromHelloCsv,
     onSummaryFinished: () => {
@@ -1865,16 +1870,48 @@ function mountTransferImporter() {
   });
 }
 
-function xlsxFileLoaders() {
-  return XLSX_IMPORT_MIME_TYPES.map((mimeType) => ({
-    mimeType,
-    label: "XLSX",
+function excelFileLoaders() {
+  return EXCEL_IMPORT_LOADERS.map((loader) => ({
+    ...loader,
     convert: async (_loadEvent, file) => {
-      if (!window.readXlsxFile) throw new Error("XLSX importer failed to load");
-      const rows = await window.readXlsxFile(file);
-      return { fileName: file.name, csvData: arrayRowsToCsv(rows) };
+      const rows = await readExcelRows(file);
+      return { fileName: file.name, csvData: arrayRowsToCsv(normalizeImportedRows(rows)) };
     }
   }));
+}
+
+async function readExcelRows(file) {
+  if (isLegacyExcelFile(file)) {
+    if (!window.XLSX) throw new Error("XLS importer failed to load");
+    const workbook = window.XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: true });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    return window.XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: false });
+  }
+  if (!window.readXlsxFile) throw new Error("XLSX importer failed to load");
+  return window.readXlsxFile(file);
+}
+
+function isLegacyExcelFile(file) {
+  return (/\.xls$/i.test(file.name || "") && !/\.xlsx$/i.test(file.name || "")) || file.type === XLS_MIME;
+}
+
+function normalizeImportedRows(rows) {
+  const denseRows = rows.map((row) => Array.from(row || []).map((value) => value ?? ""));
+  const headerIndex = findHeaderRowIndex(denseRows);
+  return denseRows.slice(headerIndex).filter((row, index) => index === 0 || row.some((value) => String(value || "").trim()));
+}
+
+function findHeaderRowIndex(rows) {
+  let bestIndex = 0;
+  let bestScore = 0;
+  rows.slice(0, 12).forEach((row, index) => {
+    const matched = new Set(row.map((value) => matchingCandidateColumn(value)?.column.id).filter(Boolean));
+    if (matched.size > bestScore) {
+      bestScore = matched.size;
+      bestIndex = index;
+    }
+  });
+  return bestScore >= 2 ? bestIndex : 0;
 }
 
 function arrayRowsToCsv(rows) {
@@ -1882,12 +1919,29 @@ function arrayRowsToCsv(rows) {
 }
 
 function suggestCandidateColumnMappings(sheetDefinitions, csvHeaders) {
+  const usedColumns = new Set();
+  const mappings = [];
+  csvHeaders.forEach((header) => {
+    const match = matchingCandidateColumn(header, sheetDefinitions);
+    if (!match || usedColumns.has(match.column.id)) return;
+    usedColumns.add(match.column.id);
+    mappings.push({ csvColumnName: header, sheetId: match.sheet.id, sheetColumnId: match.column.id });
+  });
+  return mappings;
+}
+
+function matchingCandidateColumn(header, sheetDefinitions = [CANDIDATE_SPREADSHEET_SHEET]) {
+  const headerKey = normalizeColumnKey(header);
+  if (!headerKey) return null;
   const columns = sheetDefinitions.flatMap((sheet) => sheet.columns.map((column) => ({ sheet, column })));
-  return csvHeaders.map((header) => {
-    const normalizedHeader = normalize(header);
-    const match = columns.find(({ column }) => [column.id, column.label, ...(column.suggestedMappingKeywords || [])].some((keyword) => normalize(keyword) === normalizedHeader || normalizedHeader.includes(normalize(keyword))));
-    return match ? { csvColumnName: header, sheetId: match.sheet.id, sheetColumnId: match.column.id } : null;
-  }).filter(Boolean);
+  return columns.find(({ column }) => [column.id, column.label, ...(column.suggestedMappingKeywords || [])].some((keyword) => {
+    const keywordKey = normalizeColumnKey(keyword);
+    return keywordKey === headerKey || headerKey.includes(keywordKey) || keywordKey.includes(headerKey) && headerKey.length > 3;
+  })) || null;
+}
+
+function normalizeColumnKey(value) {
+  return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
 }
 
 async function importCandidatesFromHelloCsv(importerState, onProgress) {

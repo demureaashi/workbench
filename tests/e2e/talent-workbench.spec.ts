@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import * as XLSX from "@e965/xlsx";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -272,7 +273,7 @@ test("rendered action controls are registered and key buttons respond", async ({
   await collectActions();
   await expect(page.getByText("Import JSON")).toBeVisible();
   await expect(page.getByRole("button", { name: "Import CSV" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Import XLSX" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Import XLS/XLSX" })).toBeVisible();
   await page.locator('button[data-action="open-import"][data-format="csv"]').click();
   await collectActions();
   await expect(page.locator(".transfer-dialog")).toContainText("Import CSV");
@@ -483,6 +484,62 @@ test("CSV import uses HelloCSV mapping and saves candidates", async ({ page }) =
   await expect(candidateTitle(page, "HelloCSV Import")).toBeVisible();
   await expect(page.getByText("Recruiting Engineer · Column Labs")).toBeVisible();
   await expect(page.getByText("Toronto, Canada")).toBeVisible();
+});
+
+test("legacy XLS import skips metadata rows and exports imported candidates", async ({ page }) => {
+  test.skip(test.info().project.name !== "chromium-desktop", "Legacy Excel walkthrough is covered once on desktop; responsive shell coverage is separated.");
+  await page.goto("/");
+
+  const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.aoa_to_sheet([
+    ["5bd3d376-346b-423f-8587-b73fd9b39015"],
+    ["id", "full_name", "url", "occupation", "company", "position", "location", "email", "experience", "about"],
+    [241943070, "Legacy XLS Import", "https://linkedin.com/in/legacy-xls", "Systems Engineer at Staking Facilities", "Staking Facilities", "Systems Engineer", "Berlin, Germany", "legacy@example.com", "Linux, Kubernetes and validator operations", "Open to infrastructure roles"]
+  ]);
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet 1");
+  const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xls" });
+
+  await page.locator('button[data-action="toggle-transfer-menu"][data-menu="import"]').click();
+  await page.locator('button[data-action="open-import"][data-format="xlsx"]').click();
+  await expect(page.locator(".transfer-dialog")).toContainText("Import XLS/XLSX");
+  await page.locator(".hello-csv-frame input[type=file]").setInputFiles({
+    name: "legacy-candidates.xls",
+    mimeType: "application/vnd.ms-excel",
+    buffer
+  });
+
+  await expect(page.locator(".hello-csv-frame")).toContainText("Review and confirm each mapping");
+  await expect(page.locator(".hello-csv-frame")).toContainText("full_name");
+  await expect(page.locator(".hello-csv-frame")).not.toContainText("5bd3d376");
+  await page.getByRole("button", { name: "Confirm" }).click();
+  await expect(page.locator(".hello-csv-frame")).toContainText("Valid (1)");
+  await expect(page.locator(".hello-csv-frame")).toContainText("Legacy XLS Import");
+  await page.getByRole("button", { name: "Upload" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  await page.getByRole("button", { name: /Profiles/ }).click();
+  await expect(candidateTitle(page, "Legacy XLS Import")).toBeVisible();
+  await expect(page.getByText("Systems Engineer at Staking Facilities · Staking Facilities")).toBeVisible();
+  await expect(page.getByText("Berlin, Germany")).toBeVisible();
+  await expect(page.getByRole("link", { name: "LinkedIn" })).toBeVisible();
+
+  await page.locator('button[data-action="toggle-transfer-menu"][data-menu="export"]').click();
+  await page.locator('button[data-action="open-export"][data-format="csv"]').click();
+  const [csvDownload] = await Promise.all([
+    page.waitForEvent("download"),
+    page.locator('button[data-action="download-transfer"][data-format="csv"]').click()
+  ]);
+  const csvPath = join(test.info().outputDir, "legacy-export.csv");
+  await csvDownload.saveAs(csvPath);
+  expect(readFileSync(csvPath, "utf8")).toContain("Legacy XLS Import");
+
+  await page.locator('button[data-action="toggle-transfer-menu"][data-menu="export"]').click();
+  await page.locator('button[data-action="open-export"][data-format="xlsx"]').click();
+  const [xlsxDownload] = await Promise.all([
+    page.waitForEvent("download"),
+    page.locator('button[data-action="download-transfer"][data-format="xlsx"]').click()
+  ]);
+  expect(xlsxDownload.suggestedFilename()).toMatch(/talent-workbench-.*-candidates-.*\.xlsx/);
 });
 
 test("native date inputs and resume/link handling stay wired in drawers", async ({ page }) => {

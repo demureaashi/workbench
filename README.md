@@ -47,4 +47,4 @@ Use the topbar `Export` menu to download the active workspace in one of three fo
 Use the matching `Import` menu for restores or spreadsheet ingestion:
 
 - `Import JSON` restores or replaces a complete Workbench workspace in IndexedDB.
-- `Import CSV` and `Import XLSX` open the HelloCSV review flow for candidate rows, including upload, column mapping, validation, preview and confirmation before records are saved.
+- `Import CSV` and `Import XLS/XLSX` open the HelloCSV review flow for candidate rows, including upload, column mapping, validation, preview and confirmation before records are saved. Legacy `.xls` files are accepted on import and normalized into the same candidate mapping flow.

@@ -1,15 +1,16 @@
-const CACHE_NAME = "talent-workbench-v42";
+const CACHE_NAME = "talent-workbench-v43";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=42",
-  "./app.js?v=42",
+  "./styles.css?v=43",
+  "./app.js?v=43",
   "./capture-setup.html",
   "./manifest.webmanifest",
   "./vendor/hello-csv/index.es.js",
-  "./vendor/hello-csv/hello-csv.css?v=42",
-  "./vendor/xlsx/read-excel-file.min.js?v=42",
-  "./vendor/xlsx/write-excel-file.min.js?v=42",
+  "./vendor/hello-csv/hello-csv.css?v=43",
+  "./vendor/xls/xlsx.full.min.js?v=43",
+  "./vendor/xlsx/read-excel-file.min.js?v=43",
+  "./vendor/xlsx/write-excel-file.min.js?v=43",
   "./fonts/Figtree-roman.woff2",
   "./fonts/Figtree-italic.woff2",
   "./fonts/Playfair-roman.woff2",
