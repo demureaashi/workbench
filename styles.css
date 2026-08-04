@@ -475,6 +475,16 @@ h1 {
   background: color-mix(in srgb, var(--color-text) 7%, transparent);
 }
 
+.sync-pill {
+  min-width: 92px;
+  justify-content: center;
+}
+
+.sync-pill[data-status="error"] {
+  color: #b3402b;
+  border-color: color-mix(in srgb, #b3402b 42%, var(--color-divider));
+}
+
 .btn-ghost {
   color: var(--color-accent);
   padding-inline: 4px;
@@ -1348,6 +1358,14 @@ textarea.input {
 
 .transfer-dialog {
   width: min(980px, 100%);
+}
+
+.cloud-dialog {
+  width: min(460px, 100%);
+}
+
+.cloud-summary {
+  grid-template-columns: 1fr;
 }
 
 .transfer-summary {

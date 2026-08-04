@@ -2,7 +2,7 @@
 
 Offline-first personal recruiting OS for `workbench.akankshaps.com`.
 
-The shipped app starts with a single empty `Superteam Talent` workspace and stores records, workspace data, and resume blobs in IndexedDB. UI state such as the active workspace, tab, and filters is stored in `localStorage`.
+The shipped app starts with a single empty `Superteam Talent` workspace and stores records, workspace data, and resume blobs in IndexedDB for offline use. When Supabase is configured and the operator signs in, IndexedDB stays as the local cache and records sync to Supabase Postgres and Storage. UI state such as the active workspace, tab, and filters is stored in `localStorage`.
 
 Supabase-backed persistence is being added with GitHub Pages as the frontend host. See [docs/SUPABASE_HOSTING.md](docs/SUPABASE_HOSTING.md) for where to add project values, the database migration, and the hosting setup.
 

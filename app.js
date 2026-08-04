@@ -4,7 +4,9 @@ const DB_NAME = "talentWorkbench";
 const DB_VERSION = 1;
 const STATE_KEY = "main";
 const UI_KEY = "talentWorkbench.ui.v1";
+const CLOUD_SESSION_KEY = "talentWorkbench.supabase.session.v1";
 const WINDOW_NAME_PREFIX = "talentWorkbenchCapture";
+const CLOUD_SYNC_DEBOUNCE = 900;
 
 const STAGES = ["Sourced", "Contacted", "Replied", "Screening", "Shortlisted", "Submitted", "Interviewing", "Offered", "Hired", "Rejected", "Dropped Out", "Closed"];
 const ARCHIVED_STAGES = ["Hired", "Dropped Out", "Closed"];
@@ -72,6 +74,9 @@ const CANDIDATE_SPREADSHEET_SHEET = {
   label: "Candidates",
   columns: CANDIDATE_SPREADSHEET_COLUMNS
 };
+
+const CLOUD_CONFIG = window.TALENT_WORKBENCH_CONFIG || {};
+const CLOUD_BUCKET = CLOUD_CONFIG.supabaseStorageBucket || "candidate-files";
 
 const NAV = [
   ["dashboard", "Dashboard", "dashboard"],
@@ -164,6 +169,20 @@ let transferDialog = null;
 let duplicateNotice = null;
 let selectedCaptureId = "";
 let toastTimer = null;
+let authDialog = false;
+let authEmail = "";
+let cloudSyncTimer = null;
+
+const cloud = {
+  enabled: Boolean(CLOUD_CONFIG.supabaseUrl && CLOUD_CONFIG.supabaseAnonKey),
+  session: null,
+  user: null,
+  status: "local",
+  message: "",
+  syncing: false,
+  dirty: false,
+  booting: false
+};
 
 const app = document.querySelector("#app");
 
@@ -173,6 +192,7 @@ async function init() {
   window.name = captureWindowName();
   db = await openDb();
   state = normalizeState(await readState() || emptyState());
+  await initCloud();
   if (new URLSearchParams(location.search).get("seed") === "1" && isEmptyData(state)) {
     state = normalizeState(demoSeed());
     await saveState();
@@ -211,6 +231,7 @@ function render() {
     ${renderWorkspaceDialog()}
     ${renderTransferDialog()}
     ${renderDuplicateNoticeDialog()}
+    ${renderAuthDialog()}
     ${ui.toast ? `<div class="toast">${escapeHtml(ui.toast)}</div>` : ""}
   `;
   queueMicrotask(mountTransferImporter);
@@ -294,6 +315,7 @@ function renderTopbar(ws) {
         <h1>${titles[ui.tab] || "Overview"}</h1>
       </div>
       <div class="topbar-actions">
+        ${renderCloudControl()}
         <label class="search-wrap">
           <span>${icon("search", 14, 1.6)}</span>
           <input class="input" data-ui="query" value="${escapeAttr(ui.query)}" placeholder="Search candidates, roles, notes...">
@@ -317,6 +339,51 @@ function renderTopbar(ws) {
         <button class="btn btn-primary" data-action="${primary.action}" type="button">${primary.label}</button>
       </div>
     </header>
+  `;
+}
+
+function renderCloudControl() {
+  if (!cloud.enabled) return `<button class="btn btn-secondary sync-pill" data-action="open-auth" type="button">${icon("archive", 13, 1.5)}Local</button>`;
+  if (!cloud.session) return `<button class="btn btn-secondary sync-pill" data-action="open-auth" type="button">${icon("upload", 13, 1.5)}Sign in</button>`;
+  const label = cloud.status === "syncing" ? "Syncing" : cloud.status === "error" ? "Needs attention" : "Synced";
+  return `<button class="btn btn-secondary sync-pill" data-action="open-auth" data-status="${escapeAttr(cloud.status)}" title="${escapeAttr(cloud.message || label)}" type="button">${icon(cloud.status === "error" ? "close" : "check", 13, 1.7)}${label}</button>`;
+}
+
+function renderAuthDialog() {
+  if (!authDialog) return "";
+  return `
+    <div class="dialog-backdrop" data-action="close-auth">
+      <section class="dialog cloud-dialog" data-dialog>
+        <div class="dialog-title">Cloud sync</div>
+        ${cloud.enabled ? renderCloudAuthBody() : `<p class="muted transfer-copy">Supabase is not configured for this build. Add the project URL and publishable key to the Pages variables, then redeploy.</p>`}
+      </section>
+    </div>
+  `;
+}
+
+function renderCloudAuthBody() {
+  if (cloud.session) {
+    return `
+      <div class="transfer-summary cloud-summary">
+        <div><b>${escapeHtml(cloud.status === "error" ? "Needs attention" : cloud.status === "syncing" ? "Syncing" : "Synced")}</b><span>${escapeHtml(cloud.message || "Supabase is connected")}</span></div>
+        <div><b>${escapeHtml(cloud.user?.email || "Signed in")}</b><span>current operator</span></div>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" data-action="sync-now" type="button">Sync now</button>
+        <button class="btn btn-secondary" data-action="sign-out" type="button">Sign out</button>
+        <button class="btn btn-primary" data-action="close-auth" type="button">Done</button>
+      </div>
+    `;
+  }
+  return `
+    <p class="muted transfer-copy">Sign in with the operator email. Workbench keeps IndexedDB as the offline cache and syncs this browser to Supabase when connected.</p>
+    <form data-form="auth" class="stack">
+      <div class="field"><label>Email</label><input class="input" name="email" type="email" value="${escapeAttr(authEmail)}" placeholder="you@example.com" required></div>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" data-action="close-auth" type="button">Cancel</button>
+        <button class="btn btn-primary" type="submit">Send magic link</button>
+      </div>
+    </form>
   `;
 }
 
@@ -851,7 +918,7 @@ function renderFilesEditor() {
       <div class="section-line"><div class="label-upper" style="color:var(--color-accent)">Resume & links</div><span class="muted" style="font-size:10.5px">${files.length + links.length} attached</span></div>
       <label class="drop-zone" data-action="file-drop">
         <span>Drop resumes here, or <span style="color:var(--color-accent);border-bottom:1px solid var(--color-accent)">browse your laptop</span></span>
-        <span class="muted" style="font-size:11px">PDF, DOCX, PNG - stored locally with the record</span>
+        <span class="muted" style="font-size:11px">PDF, DOCX, PNG - stored with the record</span>
         <input class="sr-only" data-action="candidate-files" type="file" multiple>
       </label>
       <div class="stack" style="gap:5px;margin-top:8px">${files.map((f) => `<div class="file-row"><span style="display:flex;color:var(--color-accent)">${icon("file")}</span><span>${escapeHtml(f.name)}</span><span class="muted num">${escapeHtml(formatSize(f.size))}</span><button class="tw-ib" data-action="download-file" data-file-id="${f.id}" title="Download file" type="button">${icon("download")}</button><button class="tw-ib" data-action="remove-file" data-file-id="${f.id}" title="Remove file" type="button">${icon("close")}</button></div>`).join("")}</div>
@@ -1064,6 +1131,16 @@ async function handleClick(event) {
     render();
   }
   if (action === "download-transfer") await exportTabularWorkspace(el.dataset.format);
+  if (action === "open-auth") {
+    authDialog = true;
+    render();
+  }
+  if (action === "close-auth") {
+    authDialog = false;
+    render();
+  }
+  if (action === "sync-now") await syncCloudNow();
+  if (action === "sign-out") await signOutCloud();
   if (action === "close-transfer") {
     transferDialog = null;
     render();
@@ -1108,8 +1185,8 @@ async function handleClick(event) {
   if (action === "restore-candidate") await patchCandidate(id, { archived: false, archivedAt: "", stage: "Contacted" });
   if (action === "contacted") await contactCandidate(id);
   if (action === "snooze") await snoozeCandidate(id);
-  if (action === "download-first-file") downloadFirstFile(id);
-  if (action === "download-file") downloadDraftFile(el.dataset.fileId);
+  if (action === "download-first-file") await downloadFirstFile(id);
+  if (action === "download-file") await downloadDraftFile(el.dataset.fileId);
   if (action === "remove-file") {
     draftCandidate.files = (draftCandidate.files || []).filter((f) => f.id !== el.dataset.fileId);
     render();
@@ -1252,6 +1329,7 @@ async function handleSubmit(event) {
   if (form.dataset.form === "role") await saveRoleForm(form);
   if (form.dataset.form === "template") await saveTemplateForm(form);
   if (form.dataset.form === "workspace") await saveWorkspaceForm(form);
+  if (form.dataset.form === "auth") await submitAuthForm(form);
 }
 
 async function saveCandidateForm(form) {
@@ -1800,8 +1878,11 @@ function readState() {
   return tx("readonly", (store) => store.get(STATE_KEY));
 }
 
-function saveState() {
-  return tx("readwrite", (store) => store.put(state, STATE_KEY));
+async function saveState(options = {}) {
+  const normalized = normalizeState(state);
+  state = normalized;
+  await tx("readwrite", (store) => store.put(state, STATE_KEY));
+  if (!options.skipCloud) scheduleCloudSync();
 }
 
 function tx(mode, fn) {
@@ -1811,6 +1892,611 @@ function tx(mode, fn) {
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
+}
+
+async function initCloud() {
+  if (!cloud.enabled) return;
+  cloud.booting = true;
+  try {
+    const callbackSession = sessionFromHash();
+    cloud.session = callbackSession || loadCloudSession();
+    if (!cloud.session) {
+      cloud.status = "local";
+      cloud.message = "Sign in to sync with Supabase";
+      return;
+    }
+    if (sessionNeedsRefresh(cloud.session)) await refreshCloudSession();
+    await loadCloudUser();
+    if (!cloud.session) return;
+    cloud.status = "syncing";
+    cloud.message = "Loading Supabase data";
+    const cloudState = await loadCloudState();
+    if (isEmptyData(cloudState) && !isEmptyData(state)) {
+      await pushCloudState();
+      cloud.status = "synced";
+      cloud.message = "Local data uploaded to Supabase";
+      return;
+    }
+    state = mergeStates(state, cloudState);
+    await saveState({ skipCloud: true });
+    await pushCloudState();
+    cloud.status = "synced";
+    cloud.message = "Supabase is connected";
+  } catch (error) {
+    cloud.status = "error";
+    cloud.message = error.message || "Cloud sync failed";
+  } finally {
+    cloud.booting = false;
+  }
+}
+
+function sessionFromHash() {
+  const hash = new URLSearchParams(location.hash.replace(/^#/, ""));
+  const accessToken = hash.get("access_token");
+  const refreshToken = hash.get("refresh_token");
+  if (!accessToken || !refreshToken) return null;
+  const session = {
+    access_token: accessToken,
+    refresh_token: refreshToken,
+    expires_at: Math.floor(Date.now() / 1000) + Number(hash.get("expires_in") || 3600),
+    token_type: hash.get("token_type") || "bearer"
+  };
+  saveCloudSession(session);
+  history.replaceState({}, "", `${location.pathname}${location.search}`);
+  return session;
+}
+
+function loadCloudSession() {
+  try {
+    const session = JSON.parse(localStorage.getItem(CLOUD_SESSION_KEY) || "null");
+    return session?.access_token ? session : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveCloudSession(session) {
+  cloud.session = session;
+  localStorage.setItem(CLOUD_SESSION_KEY, JSON.stringify(session));
+}
+
+function clearCloudSession() {
+  cloud.session = null;
+  cloud.user = null;
+  localStorage.removeItem(CLOUD_SESSION_KEY);
+}
+
+function sessionNeedsRefresh(session) {
+  return Number(session?.expires_at || 0) < Math.floor(Date.now() / 1000) + 120;
+}
+
+async function refreshCloudSession() {
+  if (!cloud.session?.refresh_token) return clearCloudSession();
+  const data = await supabaseFetch(`/auth/v1/token?grant_type=refresh_token`, {
+    method: "POST",
+    body: JSON.stringify({ refresh_token: cloud.session.refresh_token })
+  }, false);
+  saveCloudSession({
+    access_token: data.access_token,
+    refresh_token: data.refresh_token || cloud.session.refresh_token,
+    expires_at: Math.floor(Date.now() / 1000) + Number(data.expires_in || 3600),
+    token_type: data.token_type || "bearer"
+  });
+}
+
+async function loadCloudUser() {
+  const user = await supabaseFetch("/auth/v1/user");
+  cloud.user = user;
+}
+
+async function submitAuthForm(form) {
+  const data = Object.fromEntries(new FormData(form));
+  authEmail = String(data.email || "").trim();
+  if (!authEmail) {
+    say("Enter an email");
+    return;
+  }
+  try {
+    await supabaseFetch("/auth/v1/otp", {
+      method: "POST",
+      body: JSON.stringify({
+        email: authEmail,
+        create_user: true,
+        options: { email_redirect_to: `${location.origin}${location.pathname}` }
+      })
+    }, false, false);
+    authDialog = false;
+    say("Magic link sent");
+    render();
+  } catch (error) {
+    cloud.status = "error";
+    cloud.message = error.message || "Could not send magic link";
+    say(cloud.message);
+    render();
+  }
+}
+
+async function signOutCloud() {
+  try {
+    if (cloud.session) await supabaseFetch("/auth/v1/logout", { method: "POST" }, true, false);
+  } catch {
+    // Local sign-out should still complete if the network is unavailable.
+  }
+  clearCloudSession();
+  cloud.status = "local";
+  cloud.message = "Signed out";
+  authDialog = false;
+  say("Signed out");
+  render();
+}
+
+async function syncCloudNow() {
+  if (!cloud.session) {
+    authDialog = true;
+    render();
+    return;
+  }
+  clearTimeout(cloudSyncTimer);
+  await flushCloudSync();
+  authDialog = true;
+  render();
+}
+
+function scheduleCloudSync() {
+  if (!cloud.enabled || !cloud.session || cloud.booting) return;
+  cloud.dirty = true;
+  cloud.status = "syncing";
+  cloud.message = "Sync queued";
+  clearTimeout(cloudSyncTimer);
+  cloudSyncTimer = setTimeout(() => flushCloudSync(), CLOUD_SYNC_DEBOUNCE);
+}
+
+async function flushCloudSync() {
+  if (!cloud.enabled || !cloud.session || cloud.syncing) return;
+  cloud.syncing = true;
+  cloud.status = "syncing";
+  cloud.message = "Writing to Supabase";
+  render();
+  try {
+    if (sessionNeedsRefresh(cloud.session)) await refreshCloudSession();
+    await pushCloudState();
+    cloud.dirty = false;
+    cloud.status = "synced";
+    cloud.message = `Synced ${formatDateTime(new Date().toISOString())}`;
+    await tx("readwrite", (store) => store.put(state, STATE_KEY));
+  } catch (error) {
+    cloud.status = "error";
+    cloud.message = error.message || "Cloud sync failed";
+  } finally {
+    cloud.syncing = false;
+    render();
+  }
+}
+
+async function supabaseFetch(path, options = {}, auth = true, parseJson = true) {
+  const url = `${String(CLOUD_CONFIG.supabaseUrl || "").replace(/\/+$/, "")}${path}`;
+  const headers = {
+    apikey: CLOUD_CONFIG.supabaseAnonKey,
+    ...(options.body ? { "content-type": "application/json" } : {}),
+    ...(auth && cloud.session?.access_token ? { authorization: `Bearer ${cloud.session.access_token}` } : {}),
+    ...(options.headers || {})
+  };
+  const response = await fetch(url, { ...options, headers });
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(text ? compactError(text) : `Supabase request failed (${response.status})`);
+  }
+  if (!parseJson || response.status === 204) return null;
+  return response.json();
+}
+
+function compactError(text) {
+  try {
+    const parsed = JSON.parse(text);
+    return parsed.message || parsed.error_description || parsed.error || text.slice(0, 160);
+  } catch {
+    return text.slice(0, 160);
+  }
+}
+
+async function loadCloudState() {
+  const [workspaces, roles, candidates, links, files, templates, captures] = await Promise.all([
+    restSelect("workspaces", "order=created_at.asc"),
+    restSelect("roles", "order=created_at.asc"),
+    restSelect("candidates", "order=created_at.asc"),
+    restSelect("candidate_links", "order=position.asc"),
+    restSelect("candidate_files", "order=created_at.asc"),
+    restSelect("templates", "order=created_at.asc"),
+    restSelect("captures", "order=created_at.desc")
+  ]);
+  const linksByCandidate = groupBy(links, "candidate_id");
+  const filesByCandidate = groupBy(files, "candidate_id");
+  return normalizeState({
+    workspaces: workspaces.map(workspaceFromCloud),
+    roles: roles.map(roleFromCloud),
+    candidates: candidates.map((candidate) => candidateFromCloud(candidate, linksByCandidate.get(candidate.id) || [], filesByCandidate.get(candidate.id) || [])),
+    templates: templates.map(templateFromCloud),
+    captures: captures.map(captureFromCloud)
+  });
+}
+
+async function pushCloudState() {
+  if (!cloud.session) return;
+  const snapshot = normalizeState(state);
+  await uploadCandidateFiles(snapshot);
+  await upsertRows("workspaces", snapshot.workspaces.map(workspaceToCloud));
+  for (const workspace of snapshot.workspaces) await replaceWorkspaceRows(workspace.id, snapshot);
+  state = snapshot;
+}
+
+async function replaceWorkspaceRows(workspaceId, snapshot) {
+  await restDelete("captures", `workspace_id=eq.${encodeURIComponent(workspaceId)}`);
+  await restDelete("templates", `workspace_id=eq.${encodeURIComponent(workspaceId)}`);
+  await restDelete("candidates", `workspace_id=eq.${encodeURIComponent(workspaceId)}`);
+  await restDelete("roles", `workspace_id=eq.${encodeURIComponent(workspaceId)}`);
+
+  const roles = snapshot.roles.filter((role) => role.workspaceId === workspaceId).map(roleToCloud);
+  const candidates = snapshot.candidates.filter((candidate) => candidate.workspaceId === workspaceId).map(candidateToCloud);
+  const links = snapshot.candidates
+    .filter((candidate) => candidate.workspaceId === workspaceId)
+    .flatMap((candidate) => (candidate.links || []).map((url, index) => candidateLinkToCloud(candidate, url, index)));
+  const files = snapshot.candidates
+    .filter((candidate) => candidate.workspaceId === workspaceId)
+    .flatMap((candidate) => (candidate.files || []).filter((file) => file.storageKey).map((file) => candidateFileToCloud(candidate, file)));
+  const templates = snapshot.templates.filter((template) => template.workspaceId === workspaceId).map(templateToCloud);
+  const captures = snapshot.captures.filter((capture) => capture.workspaceId === workspaceId).map(captureToCloud);
+
+  await upsertRows("roles", roles);
+  await upsertRows("candidates", candidates);
+  await upsertRows("candidate_links", links);
+  await upsertRows("candidate_files", files);
+  await upsertRows("templates", templates);
+  await upsertRows("captures", captures);
+}
+
+async function restSelect(table, query = "") {
+  const suffix = query ? `&${query}` : "";
+  return supabaseFetch(`/rest/v1/${table}?select=*${suffix}`, { headers: { accept: "application/json" } });
+}
+
+async function restDelete(table, query) {
+  await supabaseFetch(`/rest/v1/${table}?${query}`, {
+    method: "DELETE",
+    headers: { prefer: "return=minimal" }
+  }, true, false);
+}
+
+async function upsertRows(table, rows) {
+  if (!rows.length) return;
+  await supabaseFetch(`/rest/v1/${table}?on_conflict=id`, {
+    method: "POST",
+    headers: { prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify(rows)
+  }, true, false);
+}
+
+async function uploadCandidateFiles(snapshot) {
+  if (!cloud.user?.id) await loadCloudUser();
+  for (const candidate of snapshot.candidates) {
+    for (const file of candidate.files || []) {
+      if (file.storageKey || !file.blob) continue;
+      const storageKey = `${cloud.user.id}/${candidate.workspaceId}/${candidate.id}/${file.id}-${slug(file.name || "resume")}`;
+      await storageUpload(storageKey, file.blob, file.type || "application/octet-stream");
+      file.storageKey = storageKey;
+    }
+  }
+}
+
+async function storageUpload(storageKey, blob, type) {
+  const url = `${String(CLOUD_CONFIG.supabaseUrl || "").replace(/\/+$/, "")}/storage/v1/object/${encodeURIComponent(CLOUD_BUCKET)}/${storageKey.split("/").map(encodeURIComponent).join("/")}`;
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      apikey: CLOUD_CONFIG.supabaseAnonKey,
+      authorization: `Bearer ${cloud.session.access_token}`,
+      "content-type": type || "application/octet-stream",
+      "x-upsert": "true"
+    },
+    body: blob
+  });
+  if (!response.ok) throw new Error(compactError(await response.text().catch(() => "")) || "File upload failed");
+}
+
+async function storageDownload(storageKey) {
+  if (!cloud.session) throw new Error("Sign in to download this file");
+  if (sessionNeedsRefresh(cloud.session)) await refreshCloudSession();
+  const url = `${String(CLOUD_CONFIG.supabaseUrl || "").replace(/\/+$/, "")}/storage/v1/object/${encodeURIComponent(CLOUD_BUCKET)}/${storageKey.split("/").map(encodeURIComponent).join("/")}`;
+  const response = await fetch(url, {
+    headers: {
+      apikey: CLOUD_CONFIG.supabaseAnonKey,
+      authorization: `Bearer ${cloud.session.access_token}`
+    }
+  });
+  if (!response.ok) throw new Error(compactError(await response.text().catch(() => "")) || "File download failed");
+  return response.blob();
+}
+
+function workspaceToCloud(workspace) {
+  return {
+    id: workspace.id,
+    name: workspace.name || "",
+    mark: workspace.mark || "",
+    type: workspace.type || "",
+    palette: workspace.palette || "house",
+    archived: Boolean(workspace.archived)
+  };
+}
+
+function workspaceFromCloud(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    mark: row.mark,
+    type: row.type,
+    palette: row.palette,
+    archived: row.archived,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  };
+}
+
+function roleToCloud(role) {
+  return {
+    id: role.id,
+    workspace_id: role.workspaceId,
+    title: role.title || "",
+    client: role.client || "",
+    location: role.location || "",
+    priority: role.priority || "Medium",
+    status: role.status || "Active",
+    target: Number(role.target || 0),
+    submitted: Number(role.submitted || 0),
+    week: role.week || "",
+    board: role.board || "",
+    must: role.must || [],
+    nice: role.nice || "",
+    manager: role.manager || "",
+    comp: role.comp || "",
+    opened: nullableDate(role.opened),
+    due: nullableDate(role.due),
+    brief: role.brief || "",
+    screening: role.screening || "",
+    notes: role.notes || "",
+    archived: Boolean(role.archived),
+    closed: nullableDate(role.closed),
+    close_reason: role.closeReason || "",
+    archived_at: nullableDate(role.archivedAt)
+  };
+}
+
+function roleFromCloud(row) {
+  return {
+    id: row.id,
+    workspaceId: row.workspace_id,
+    title: row.title,
+    client: row.client,
+    location: row.location,
+    priority: row.priority,
+    status: row.status,
+    target: row.target,
+    submitted: row.submitted,
+    week: row.week,
+    board: row.board,
+    must: row.must || [],
+    nice: row.nice,
+    manager: row.manager,
+    comp: row.comp,
+    opened: toDateValue(row.opened),
+    due: toDateValue(row.due),
+    brief: row.brief,
+    screening: row.screening,
+    notes: row.notes,
+    archived: row.archived,
+    closed: toDateValue(row.closed),
+    closeReason: row.close_reason,
+    archivedAt: toDateValue(row.archived_at),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  };
+}
+
+function candidateToCloud(candidate) {
+  return {
+    id: candidate.id,
+    workspace_id: candidate.workspaceId,
+    name: candidate.name || "",
+    title: candidate.title || "",
+    company: candidate.company || "",
+    location: candidate.location || "",
+    role_id: candidate.roleId || null,
+    stage: candidate.stage || "Sourced",
+    follow_up: nullableDate(candidate.followUp),
+    last_contact: nullableDate(candidate.lastContact),
+    snoozed_until: nullableDate(candidate.snoozedUntil),
+    snoozed_on: nullableDate(candidate.snoozedOn),
+    contacted_on: nullableDate(candidate.contactedOn),
+    touches: Number(candidate.touches || 0),
+    linkedin: candidate.linkedin || "",
+    linkedin_key: canonicalLinkedin(candidate.linkedin),
+    email: candidate.email || "",
+    skills: candidate.skills || [],
+    notes: candidate.notes || "",
+    remarks: candidate.remarks || "",
+    sequence: candidate.sequence || "",
+    archived: Boolean(candidate.archived),
+    archived_at: nullableDate(candidate.archivedAt),
+    close_reason: candidate.closeReason || ""
+  };
+}
+
+function candidateFromCloud(row, links, files) {
+  return {
+    id: row.id,
+    workspaceId: row.workspace_id,
+    name: row.name,
+    title: row.title,
+    company: row.company,
+    location: row.location,
+    roleId: row.role_id || "",
+    stage: row.stage,
+    followUp: toDateValue(row.follow_up),
+    lastContact: toDateValue(row.last_contact),
+    snoozedUntil: toDateValue(row.snoozed_until),
+    snoozedOn: toDateValue(row.snoozed_on),
+    contactedOn: toDateValue(row.contacted_on),
+    touches: row.touches,
+    linkedin: row.linkedin,
+    email: row.email,
+    files: files.map(fileFromCloud),
+    links: links.sort((a, b) => Number(a.position || 0) - Number(b.position || 0)).map((link) => link.url),
+    skills: row.skills || [],
+    notes: row.notes,
+    remarks: row.remarks,
+    sequence: row.sequence,
+    archived: row.archived,
+    archivedAt: toDateValue(row.archived_at),
+    closeReason: row.close_reason,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  };
+}
+
+function candidateLinkToCloud(candidate, url, index) {
+  return {
+    id: `${candidate.id}_link_${index}`,
+    candidate_id: candidate.id,
+    url,
+    position: index
+  };
+}
+
+function candidateFileToCloud(candidate, file) {
+  return {
+    id: file.id,
+    candidate_id: candidate.id,
+    workspace_id: candidate.workspaceId,
+    name: file.name || "resume",
+    size: Number(file.size || 0),
+    mime_type: file.type || "",
+    storage_key: file.storageKey
+  };
+}
+
+function fileFromCloud(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    size: row.size,
+    type: row.mime_type,
+    storageKey: row.storage_key
+  };
+}
+
+function templateToCloud(template) {
+  return {
+    id: template.id,
+    workspace_id: template.workspaceId,
+    title: template.title || "",
+    type: template.type || "Outreach",
+    body: template.body || "",
+    meta: template.meta || "No usage yet"
+  };
+}
+
+function templateFromCloud(row) {
+  return {
+    id: row.id,
+    workspaceId: row.workspace_id,
+    title: row.title,
+    type: row.type,
+    body: row.body,
+    meta: row.meta || "No usage yet",
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  };
+}
+
+function captureToCloud(capture) {
+  return {
+    id: capture.id,
+    workspace_id: capture.workspaceId,
+    source: capture.source || "Web",
+    title: capture.title || "",
+    url: capture.url || "",
+    captured_when: capture.when || new Date().toISOString(),
+    snippet: capture.snippet || "",
+    name: capture.name || "",
+    parsed_title: capture.parsedTitle || "",
+    company: capture.company || "",
+    location: capture.location || "",
+    email: capture.email || "",
+    linkedin_url: capture.linkedinUrl || "",
+    link: capture.link || "",
+    role_id: capture.roleId || null,
+    dismissed: Boolean(capture.dismissedAt),
+    dismissed_at: capture.dismissedAt || null
+  };
+}
+
+function captureFromCloud(row) {
+  return {
+    id: row.id,
+    workspaceId: row.workspace_id,
+    source: row.source,
+    title: row.title,
+    url: row.url,
+    when: row.captured_when,
+    snippet: row.snippet,
+    name: row.name,
+    parsedTitle: row.parsed_title,
+    company: row.company,
+    location: row.location,
+    email: row.email,
+    linkedinUrl: row.linkedin_url,
+    link: row.link,
+    roleId: row.role_id || "",
+    notes: row.snippet,
+    dismissedAt: row.dismissed_at || (row.dismissed ? row.updated_at : "")
+  };
+}
+
+function mergeStates(localState, cloudState) {
+  if (isEmptyData(localState)) return cloudState;
+  if (isEmptyData(cloudState)) return localState;
+  return normalizeState({
+    workspaces: mergeRecords(localState.workspaces, cloudState.workspaces),
+    roles: mergeRecords(localState.roles, cloudState.roles),
+    candidates: mergeRecords(localState.candidates, cloudState.candidates),
+    templates: mergeRecords(localState.templates, cloudState.templates),
+    captures: mergeRecords(localState.captures, cloudState.captures)
+  });
+}
+
+function mergeRecords(localRows = [], cloudRows = []) {
+  const map = new Map();
+  [...cloudRows, ...localRows].forEach((row) => {
+    const existing = map.get(row.id);
+    if (!existing || updatedTime(row) >= updatedTime(existing)) map.set(row.id, row);
+  });
+  return [...map.values()];
+}
+
+function updatedTime(row) {
+  return new Date(row.updatedAt || row.createdAt || 0).getTime() || 0;
+}
+
+function groupBy(rows, key) {
+  const map = new Map();
+  rows.forEach((row) => {
+    const value = row[key];
+    if (!map.has(value)) map.set(value, []);
+    map.get(value).push(row);
+  });
+  return map;
+}
+
+function nullableDate(value) {
+  return value ? toDateValue(value) : null;
 }
 
 async function exportWorkspace() {
@@ -2101,7 +2787,7 @@ function toBoolean(value) {
 }
 
 async function serializeCandidate(candidate) {
-  return { ...candidate, files: await Promise.all((candidate.files || []).map(async (f) => ({ id: f.id, name: f.name, size: f.size, type: f.type, dataUrl: f.blob ? await blobToDataUrl(f.blob) : f.dataUrl || "" }))) };
+  return { ...candidate, files: await Promise.all((candidate.files || []).map(async (f) => ({ id: f.id, name: f.name, size: f.size, type: f.type, storageKey: f.storageKey || "", dataUrl: f.blob ? await blobToDataUrl(f.blob) : f.dataUrl || "" }))) };
 }
 
 async function importWorkspace(file) {
@@ -2441,24 +3127,34 @@ function formatSize(size) {
   return n > 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`;
 }
 
-function downloadFirstFile(candidateId) {
+async function downloadFirstFile(candidateId) {
   const file = candidateById(candidateId)?.files?.[0];
-  if (file) downloadStoredFile(file);
+  if (file) await downloadStoredFile(file);
 }
 
-function downloadDraftFile(fileId) {
+async function downloadDraftFile(fileId) {
   const file = draftCandidate?.files?.find((f) => f.id === fileId);
-  if (file) downloadStoredFile(file);
+  if (file) await downloadStoredFile(file);
 }
 
-function downloadStoredFile(file) {
-  if (!file.blob && !file.dataUrl) return;
-  const url = file.blob ? URL.createObjectURL(file.blob) : file.dataUrl;
+async function downloadStoredFile(file) {
+  if (!file.blob && !file.dataUrl && !file.storageKey) return;
+  let blob = file.blob;
+  if (!blob && file.storageKey) {
+    try {
+      blob = await storageDownload(file.storageKey);
+      file.blob = blob;
+    } catch (error) {
+      say(error.message || "File download failed");
+      return;
+    }
+  }
+  const url = blob ? URL.createObjectURL(blob) : file.dataUrl;
   const link = document.createElement("a");
   link.href = url;
   link.download = file.name || "resume";
   link.click();
-  if (file.blob) URL.revokeObjectURL(url);
+  if (blob) URL.revokeObjectURL(url);
 }
 
 function downloadBlob(blob, name) {

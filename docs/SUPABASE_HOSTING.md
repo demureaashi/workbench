@@ -80,17 +80,18 @@ This avoids operating a Node API. If we later need server-only logic, add a thin
 
 This is the clean "option 3" for `workbench.akankshaps.com`: GitHub Pages hosts the exact visual app, while Supabase handles the persisted database, auth, and private resume files.
 
-## Implementation sequence
+## Implemented sync behavior
 
-1. Add `@supabase/supabase-js` to the web app.
-2. Add a sign-in screen using Supabase Auth magic links.
-3. Build a Supabase repository module for workspaces, roles, candidates, templates, captures and files.
-4. Keep local IndexedDB writes instant, then sync to Supabase in the background.
-5. Use `linkedin_key` for duplicate protection in Supabase, matching the app's canonical LinkedIn logic.
-6. Move resume blobs from IndexedDB-only into Supabase Storage with paths like:
+- The static app reads `window.TALENT_WORKBENCH_CONFIG` from the deploy-generated `config.js`.
+- Supabase Auth magic links sign in the single operator.
+- IndexedDB remains the instant offline cache.
+- Signed-in sessions hydrate from Supabase and then merge with local records by `updatedAt`.
+- Local saves are debounced and synced to Supabase Postgres in the background.
+- Resume blobs upload to private Supabase Storage paths like:
 
 ```txt
 {user_id}/{workspace_id}/{candidate_id}/{file_id}-{filename}
 ```
 
-7. Show sync status in the UI: `Local`, `Syncing`, `Synced`, `Needs attention`.
+- `linkedin_key` is written for duplicate protection, matching the app's canonical LinkedIn logic.
+- The topbar sync control shows `Sign in`, `Syncing`, `Synced` or `Needs attention`.

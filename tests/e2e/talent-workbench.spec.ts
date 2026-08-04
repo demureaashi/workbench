@@ -11,6 +11,7 @@ const KNOWN_ACTIONS = [
   "candidate-files",
   "clear-follow-filters",
   "clear-profile-filters",
+  "close-auth",
   "close-drawers",
   "close-duplicate-notice",
   "close-template",
@@ -41,6 +42,7 @@ const KNOWN_ACTIONS = [
   "new-template",
   "new-workspace",
   "open-export",
+  "open-auth",
   "open-import",
   "pick-palette",
   "rank-role",
@@ -51,7 +53,9 @@ const KNOWN_ACTIONS = [
   "select-capture",
   "select-role-detail",
   "select-template",
+  "sign-out",
   "snooze",
+  "sync-now",
   "switch-workspace",
   "tab",
   "template-cat",
@@ -331,7 +335,27 @@ test("rendered action controls are registered and key buttons respond", async ({
 
   const unknown = [...seen].filter((action) => !KNOWN_ACTIONS.includes(action)).sort();
   expect(unknown).toEqual([]);
-  expect([...seen]).toEqual(expect.arrayContaining(["workspace-menu", "switch-workspace", "pick-palette", "toggle-transfer-menu", "open-export", "open-import", "download-transfer", "duplicate-role", "rank-role", "edit-candidate", "copy-follow-section", "copy-template", "duplicate-template", "copy-bookmarklet"]));
+  expect([...seen]).toEqual(expect.arrayContaining(["workspace-menu", "switch-workspace", "pick-palette", "toggle-transfer-menu", "open-export", "open-import", "download-transfer", "open-auth", "duplicate-role", "rank-role", "edit-candidate", "copy-follow-section", "copy-template", "duplicate-template", "copy-bookmarklet"]));
+});
+
+test("Supabase config enables cloud sign-in without leaking secrets to tests", async ({ page }) => {
+  await page.route("**/config.js?v=50", async (route) => {
+    await route.fulfill({
+      contentType: "application/javascript",
+      body: 'window.TALENT_WORKBENCH_CONFIG = { supabaseUrl: "https://example.supabase.co", supabaseAnonKey: "test-publishable-key", supabaseStorageBucket: "candidate-files" };'
+    });
+  });
+  await page.route("https://example.supabase.co/auth/v1/otp", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: "{}" });
+  });
+
+  await page.goto("/");
+  await expect(page.locator('button[data-action="open-auth"]')).toContainText("Sign in");
+  await page.locator('button[data-action="open-auth"]').click();
+  await expect(page.locator(".cloud-dialog")).toContainText("Cloud sync");
+  await page.locator('form[data-form="auth"] input[name="email"]').fill("operator@example.com");
+  await page.locator('form[data-form="auth"] button[type="submit"]').click();
+  await expect(page.getByText("Magic link sent")).toBeVisible();
 });
 
 test("role, candidate, follow-up, archive, template, capture, workspace and import/export flow", async ({ page }) => {
