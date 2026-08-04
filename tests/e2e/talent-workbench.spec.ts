@@ -382,7 +382,9 @@ test("role, candidate, follow-up, archive, template, capture, workspace and impo
   await expect(captureBookmarklet).toBeVisible();
   await expect(captureBookmarklet).toHaveAttribute("href", /javascript:.*talentWorkbenchCapture/);
   await expect(captureBookmarklet).toHaveAttribute("href", /capture=1/);
+  await expect(captureBookmarklet).toHaveAttribute("href", /linkedinUrl/);
   await expect(captureBookmarklet).not.toHaveAttribute("href", /Open Talent Workbench once/);
+  expect(await captureBookmarklet.getAttribute("href")).toContain(encodeURIComponent(new URL(page.url()).origin));
   await expect(page.locator(".code-box")).toHaveCount(0);
   await page.evaluate(() => {
     window.postMessage({
@@ -452,6 +454,23 @@ test("role, candidate, follow-up, archive, template, capture, workspace and impo
   await page.locator('form[data-form="workspace"] button[type="submit"]').click();
   await expect(page.locator(".topbar .kicker")).toContainText("Palette QA");
   await expect(page.locator(".workspace-mark").last()).toHaveText("PQ");
+});
+
+test("capture fallback URL lands directly in the active workspace inbox", async ({ page }) => {
+  await page.goto("/?capture=1&title=Fallback%20Candidate%20-%20Talent%20Lead%20at%20RCP&url=https%3A%2F%2Fwww.linkedin.com%2Fin%2Ffallback-candidate%2F&text=Fallback%20Candidate%2C%20Talent%20Lead%2C%20RCP%2C%20Toronto%2C%20Canada&linkedinUrl=https%3A%2F%2Fwww.linkedin.com%2Fin%2Ffallback-candidate%2F");
+  await expect(page.getByText("Capture added")).toBeVisible();
+  await expect(page.locator(".capture-row-title", { hasText: "Fallback Candidate" })).toBeVisible();
+  await expect(page.locator('input[data-capture-patch][data-field="name"]')).toHaveValue("Fallback Candidate");
+  await expect(page.locator('input[data-capture-patch][data-field="location"]')).toHaveValue("Toronto, Canada");
+});
+
+test("standalone capture setup generates a deployment-scoped bookmarklet", async ({ page }) => {
+  await page.goto("/capture-setup.html");
+  const bookmark = page.locator("#bookmark");
+  await expect(bookmark).toHaveAttribute("href", /javascript:.*talentWorkbenchCapture/);
+  await expect(bookmark).toHaveAttribute("href", /capture=1/);
+  await expect(bookmark).toHaveAttribute("href", /linkedinUrl/);
+  expect(await bookmark.getAttribute("href")).toContain(encodeURIComponent(new URL(page.url()).origin));
 });
 
 test("CSV import uses HelloCSV mapping and saves candidates", async ({ page }) => {

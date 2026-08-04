@@ -4,7 +4,7 @@ const DB_NAME = "talentWorkbench";
 const DB_VERSION = 1;
 const STATE_KEY = "main";
 const UI_KEY = "talentWorkbench.ui.v1";
-const WINDOW_NAME = "talentWorkbenchCapture";
+const WINDOW_NAME_PREFIX = "talentWorkbenchCapture";
 
 const STAGES = ["Sourced", "Contacted", "Replied", "Screening", "Shortlisted", "Submitted", "Interviewing", "Offered", "Hired", "Rejected", "Dropped Out", "Closed"];
 const ARCHIVED_STAGES = ["Hired", "Dropped Out", "Closed"];
@@ -170,7 +170,7 @@ const app = document.querySelector("#app");
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
-  window.name = WINDOW_NAME;
+  window.name = captureWindowName();
   db = await openDb();
   state = normalizeState(await readState() || emptyState());
   if (new URLSearchParams(location.search).get("seed") === "1" && isEmptyData(state)) {
@@ -2173,7 +2173,9 @@ async function ingestUrlCapture() {
   await addCapture(createCapture({
     title: params.get("title") || "",
     url: params.get("url") || "",
-    selection: params.get("text") || ""
+    selection: params.get("text") || "",
+    emailClues: params.get("emailClues") || "",
+    linkedinUrl: params.get("linkedinUrl") || ""
   }));
   history.replaceState({}, "", location.pathname);
 }
@@ -2240,8 +2242,13 @@ function parseCapturePayload(payload, text) {
 function buildBookmarklet() {
   const origin = location.origin;
   const appUrl = new URL(location.pathname || "/", location.origin).href;
-  const code = `(function(){var s=String(window.getSelection&&window.getSelection()||'').slice(0,4000);var emails=Array.from(document.body.innerText.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,}/ig)).slice(0,5).map(function(m){return m[0]});var linked=location.href.indexOf('linkedin.com')>-1?location.href:'';var p={type:'talent:capture',title:document.title,url:location.href,selection:s,emailClues:emails,linkedinUrl:linked};var q='capture=1&title='+encodeURIComponent(p.title)+'&url='+encodeURIComponent(p.url)+'&text='+encodeURIComponent(p.selection);var w=window.open('','${WINDOW_NAME}');if(!w||w.closed){window.open('${appUrl}?'+q,'${WINDOW_NAME}');return;}try{if(w.location.href==='about:blank'){w.location.href='${appUrl}?'+q;return;}}catch(e){}w.postMessage(p,'${origin}');})();`;
+  const name = captureWindowName(origin);
+  const code = `(function(){var s=String(window.getSelection&&window.getSelection()||'').slice(0,4000);var emails=Array.from(document.body.innerText.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,}/ig)).slice(0,5).map(function(m){return m[0]});var linked=location.href.indexOf('linkedin.com')>-1?location.href:'';var p={type:'talent:capture',title:document.title,url:location.href,selection:s,emailClues:emails,linkedinUrl:linked};var q='capture=1&title='+encodeURIComponent(p.title)+'&url='+encodeURIComponent(p.url)+'&text='+encodeURIComponent(p.selection)+'&emailClues='+encodeURIComponent(emails.join(' '))+'&linkedinUrl='+encodeURIComponent(linked);var target='${appUrl}?'+q;var w=window.open('', '${name}');if(!w||w.closed){window.open(target,'${name}');return;}try{if(w.location.href==='about:blank'){w.location.href=target;return;}}catch(e){}w.postMessage(p,'${origin}');})();`;
   return `javascript:${code}`;
+}
+
+function captureWindowName(origin = location.origin) {
+  return `${WINDOW_NAME_PREFIX}:${encodeURIComponent(origin)}`;
 }
 
 function registerServiceWorker() {
