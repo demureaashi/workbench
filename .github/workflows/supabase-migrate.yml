@@ -1,0 +1,29 @@
+name: Supabase Migrate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+
+      - name: Apply migrations
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          for migration in supabase/migrations/*.sql; do
+            echo "Applying ${migration}"
+            psql "${SUPABASE_DB_URL}" --set ON_ERROR_STOP=1 --file "${migration}"
+          done
