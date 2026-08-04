@@ -38,4 +38,13 @@ Open the `Capture` tab and copy the bookmarklet. Keep Talent Workbench open once
 
 ## Data
 
-Use `Export` to download the active workspace, including resume files encoded in JSON. `Import` restores or replaces that workspace in IndexedDB.
+Use the topbar `Export` menu to download the active workspace in one of three formats:
+
+- `Export as JSON` downloads the complete Workbench workspace backup, including roles, candidates, templates, captures and resume files encoded in JSON.
+- `Export as CSV` downloads the active workspace's candidate table after showing the spreadsheet columns and a preview.
+- `Export as XLSX` downloads the same candidate table as an Excel workbook.
+
+Use the matching `Import` menu for restores or spreadsheet ingestion:
+
+- `Import JSON` restores or replaces a complete Workbench workspace in IndexedDB.
+- `Import CSV` and `Import XLSX` open the HelloCSV review flow for candidate rows, including upload, column mapping, validation, preview and confirmation before records are saved.

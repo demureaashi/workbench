@@ -1,3 +1,5 @@
+import { renderImporter } from "./vendor/hello-csv/index.es.js";
+
 const DB_NAME = "talentWorkbench";
 const DB_VERSION = 1;
 const STATE_KEY = "main";
@@ -31,6 +33,39 @@ const PALETTES = {
   forest: { label: "Forest", accent: "#3f7350", a100: "#e8f1ea", a600: "#2f5c3f", a700: "#234730", a800: "#173021", ink: "#16211a" },
   navy: { label: "Navy", accent: "#2c4a7c", a100: "#e8eef7", a600: "#233c66", a700: "#1a2e50", a800: "#121f36", ink: "#141c2b" },
   plum: { label: "Plum", accent: "#6f3b63", a100: "#f5eaf2", a600: "#5a2f50", a700: "#45243d", a800: "#2f1829", ink: "#1f1620" }
+};
+
+const XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+const XLSX_IMPORT_MIME_TYPES = [XLSX_MIME, "application/vnd.ms-excel", "application/octet-stream"];
+const CANDIDATE_SPREADSHEET_COLUMNS = [
+  { id: "name", label: "Name", type: "string", suggestedMappingKeywords: ["candidate", "full name", "person"], validators: [{ validate: "required", error: "Name is required" }] },
+  { id: "title", label: "Title", type: "string", suggestedMappingKeywords: ["job title", "headline", "current title"] },
+  { id: "company", label: "Company", type: "string", suggestedMappingKeywords: ["current company", "employer", "organization"] },
+  { id: "location", label: "Location", type: "string", suggestedMappingKeywords: ["city", "city country", "city, country"] },
+  { id: "roleTitle", label: "Role title", type: "string", suggestedMappingKeywords: ["role", "job", "position", "mapped role"] },
+  { id: "roleClient", label: "Role client", type: "string", suggestedMappingKeywords: ["client", "role client", "account"] },
+  { id: "stage", label: "Stage", type: "enum", suggestedMappingKeywords: ["pipeline stage", "status"], typeArguments: { values: STAGES.map((stage) => ({ label: stage, value: stage })) } },
+  { id: "followUp", label: "Follow-up", type: "string", suggestedMappingKeywords: ["follow up", "next follow up", "next date"], validators: [{ validate: "regex_matches", regex: /^$|^\d{4}-\d{2}-\d{2}$/, error: "Use YYYY-MM-DD" }] },
+  { id: "lastContact", label: "Last contact", type: "string", suggestedMappingKeywords: ["last contacted", "last contact date"], validators: [{ validate: "regex_matches", regex: /^$|^\d{4}-\d{2}-\d{2}$/, error: "Use YYYY-MM-DD" }] },
+  { id: "snoozedUntil", label: "Snoozed until", type: "string", suggestedMappingKeywords: ["wake date", "snooze until"], validators: [{ validate: "regex_matches", regex: /^$|^\d{4}-\d{2}-\d{2}$/, error: "Use YYYY-MM-DD" }] },
+  { id: "contactedOn", label: "Contacted on", type: "string", suggestedMappingKeywords: ["contacted again", "contacted date"], validators: [{ validate: "regex_matches", regex: /^$|^\d{4}-\d{2}-\d{2}$/, error: "Use YYYY-MM-DD" }] },
+  { id: "touches", label: "Touches", type: "number", suggestedMappingKeywords: ["touch count", "contact count"] },
+  { id: "linkedin", label: "LinkedIn", type: "string", suggestedMappingKeywords: ["linkedin url", "profile"] },
+  { id: "email", label: "Email", type: "string", suggestedMappingKeywords: ["email address"], validators: [{ validate: "email", error: "Use a valid email" }] },
+  { id: "skills", label: "Skills", type: "string", suggestedMappingKeywords: ["skill list", "keywords"] },
+  { id: "links", label: "Links", type: "string", suggestedMappingKeywords: ["portfolio", "website", "urls"] },
+  { id: "notes", label: "Notes", type: "string", suggestedMappingKeywords: ["note", "summary"] },
+  { id: "remarks", label: "Remarks", type: "string", suggestedMappingKeywords: ["close reason", "comment"] },
+  { id: "sequence", label: "Sequence", type: "string", suggestedMappingKeywords: ["outreach sequence"] },
+  { id: "archived", label: "Archived", type: "boolean", suggestedMappingKeywords: ["archive", "inactive"], typeArguments: { trueLabel: "Yes", falseLabel: "No" } },
+  { id: "archivedAt", label: "Archived at", type: "string", suggestedMappingKeywords: ["archive date"], validators: [{ validate: "regex_matches", regex: /^$|^\d{4}-\d{2}-\d{2}$/, error: "Use YYYY-MM-DD" }] },
+  { id: "closeReason", label: "Close reason", type: "string", suggestedMappingKeywords: ["reason", "reject reason"] }
+];
+
+const CANDIDATE_SPREADSHEET_SHEET = {
+  id: "candidates",
+  label: "Candidates",
+  columns: CANDIDATE_SPREADSHEET_COLUMNS
 };
 
 const NAV = [
@@ -120,6 +155,7 @@ let draftCandidate = null;
 let draftRole = null;
 let draftTemplate = null;
 let draftWorkspace = null;
+let transferDialog = null;
 let selectedCaptureId = "";
 let toastTimer = null;
 
@@ -167,8 +203,10 @@ function render() {
     ${renderRoleDrawer()}
     ${renderTemplateDialog()}
     ${renderWorkspaceDialog()}
+    ${renderTransferDialog()}
     ${ui.toast ? `<div class="toast">${escapeHtml(ui.toast)}</div>` : ""}
   `;
+  queueMicrotask(mountTransferImporter);
 }
 
 function icon(name, size = 14, strokeWidth = 1.6) {
@@ -253,11 +291,22 @@ function renderTopbar(ws) {
           <span>${icon("search", 14, 1.6)}</span>
           <input class="input" data-ui="query" value="${escapeAttr(ui.query)}" placeholder="Search candidates, roles, notes...">
         </label>
-        <button class="btn btn-secondary" data-action="export-workspace" type="button">${icon("download", 14, 1.6)}Export</button>
-        <label class="btn btn-secondary" style="display:inline-flex;align-items:center;gap:6px">
-          ${icon("upload", 14, 1.6)}Import
-          <input class="sr-only" data-action="import-workspace" type="file" accept="application/json">
-        </label>
+        <div class="transfer-wrap">
+          <button class="btn btn-secondary" data-action="toggle-transfer-menu" data-menu="export" type="button">${icon("download", 14, 1.6)}Export</button>
+          ${ui.transferMenu === "export" ? `<div class="transfer-menu">
+            <button data-action="export-json" type="button">Export as JSON</button>
+            <button data-action="open-export" data-format="csv" type="button">Export as CSV</button>
+            <button data-action="open-export" data-format="xlsx" type="button">Export as XLSX</button>
+          </div>` : ""}
+        </div>
+        <div class="transfer-wrap">
+          <button class="btn btn-secondary" data-action="toggle-transfer-menu" data-menu="import" type="button">${icon("upload", 14, 1.6)}Import</button>
+          ${ui.transferMenu === "import" ? `<div class="transfer-menu">
+            <label>Import JSON<input class="sr-only" data-action="import-workspace" type="file" accept="application/json,.json"></label>
+            <button data-action="open-import" data-format="csv" type="button">Import CSV</button>
+            <button data-action="open-import" data-format="xlsx" type="button">Import XLSX</button>
+          </div>` : ""}
+        </div>
         <button class="btn btn-primary" data-action="${primary.action}" type="button">${primary.label}</button>
       </div>
     </header>
@@ -905,6 +954,53 @@ function renderWorkspaceDialog() {
   `;
 }
 
+function renderTransferDialog() {
+  if (!transferDialog) return "";
+  const format = transferDialog.format.toUpperCase();
+  if (transferDialog.mode === "import") {
+    return `
+      <div class="dialog-backdrop" data-action="close-transfer">
+        <section class="dialog transfer-dialog" data-dialog>
+          <div class="dialog-title">Import ${format}</div>
+          <p class="muted" style="font-size:12.5px;margin-top:-4px">CSV and XLSX imports use HelloCSV for upload, column mapping, validation, preview, and confirmation before records are saved.</p>
+          <div class="hello-csv-frame" id="hello-csv-importer"></div>
+          <div class="dialog-actions">
+            <button class="btn btn-secondary" data-action="close-transfer" type="button">Cancel</button>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+  const rows = candidateSpreadsheetRows();
+  const columns = CANDIDATE_SPREADSHEET_COLUMNS;
+  return `
+    <div class="dialog-backdrop" data-action="close-transfer">
+      <section class="dialog transfer-dialog" data-dialog>
+        <div class="dialog-title">Export ${format}</div>
+        <p class="muted" style="font-size:12.5px;margin-top:-4px">Review the candidate columns before downloading. JSON remains the full Workbench backup with files, roles, templates and captures.</p>
+        <div class="transfer-summary">
+          <div><b class="num">${rows.length}</b><span>candidates</span></div>
+          <div><b class="num">${columns.length}</b><span>columns</span></div>
+          <div><b>${escapeHtml(activeWorkspace().name)}</b><span>active workspace</span></div>
+        </div>
+        <div class="transfer-columns">
+          ${columns.map((col) => `<span class="tag">${escapeHtml(col.label)}</span>`).join("")}
+        </div>
+        <div class="tw-tw transfer-preview">
+          <table class="tw-t">
+            <thead><tr>${columns.slice(0, 8).map((col) => `<th>${escapeHtml(col.label)}</th>`).join("")}</tr></thead>
+            <tbody>${rows.slice(0, 5).map((row) => `<tr>${columns.slice(0, 8).map((col) => `<td>${escapeHtml(row[col.id] ?? "")}</td>`).join("")}</tr>`).join("") || `<tr><td colspan="8">No candidates to export.</td></tr>`}</tbody>
+          </table>
+        </div>
+        <div class="dialog-actions">
+          <button class="btn btn-secondary" data-action="close-transfer" type="button">Cancel</button>
+          <button class="btn btn-primary" data-action="download-transfer" data-format="${escapeAttr(transferDialog.format)}" type="button">Download ${format}</button>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
 async function handleClick(event) {
   const drawer = event.target.closest("[data-drawer], [data-dialog]");
   if (drawer) event.stopPropagation();
@@ -917,6 +1013,26 @@ async function handleClick(event) {
   if (action === "workspace-menu") setUi({ workspaceMenu: !ui.workspaceMenu });
   if (action === "switch-workspace") setUi({ workspaceId: id, workspaceMenu: false, filters: defaultFilters(), followFilters: defaultFollowFilters() });
   if (action === "toggle-cross-search") setUi({ crossWorkspace: !ui.crossWorkspace, workspaceMenu: false });
+  if (action === "toggle-transfer-menu") setUi({ transferMenu: ui.transferMenu === el.dataset.menu ? "" : el.dataset.menu, workspaceMenu: false });
+  if (action === "export-json") {
+    setUi({ transferMenu: "" }, false);
+    await exportWorkspace();
+  }
+  if (action === "open-export") {
+    transferDialog = { mode: "export", format: el.dataset.format };
+    setUi({ transferMenu: "" }, false);
+    render();
+  }
+  if (action === "open-import") {
+    transferDialog = { mode: "import", format: el.dataset.format };
+    setUi({ transferMenu: "" }, false);
+    render();
+  }
+  if (action === "download-transfer") await exportTabularWorkspace(el.dataset.format);
+  if (action === "close-transfer") {
+    transferDialog = null;
+    render();
+  }
   if (action === "new-workspace") {
     draftWorkspace = { name: "", mark: "", type: "Client", palette: "ink" };
     setUi({ workspaceMenu: false });
@@ -1007,7 +1123,6 @@ async function handleClick(event) {
     copyText(buildBookmarklet());
     say("Bookmarklet copied");
   }
-  if (action === "export-workspace") await exportWorkspace();
   if (action === "load-demo") await loadDemo();
 }
 
@@ -1040,7 +1155,10 @@ async function handleChange(event) {
   if (el.dataset.rolePatch) await patchRole(el.dataset.rolePatch, { [el.dataset.field]: normalizePatchValue(el.dataset.field, el.value) });
   if (el.dataset.capturePatch) await patchCapture(el.dataset.capturePatch, { [el.dataset.field]: el.value });
   if (el.dataset.action === "candidate-files") await addDraftFiles(Array.from(el.files || []));
-  if (el.dataset.action === "import-workspace") await importWorkspace(el.files?.[0]);
+  if (el.dataset.action === "import-workspace") {
+    setUi({ transferMenu: "" }, false);
+    await importWorkspace(el.files?.[0]);
+  }
 }
 
 function updateFilterControl(el, cursor = null) {
@@ -1597,7 +1715,7 @@ function loadUi() {
 }
 
 function defaultUi() {
-  return { tab: "dashboard", workspaceId: "st", workspaceMenu: false, query: "", crossWorkspace: false, filters: defaultFilters(), followTab: "queue", followFilters: defaultFollowFilters(), detailRoleId: "", templateCat: "All", templateId: "", linkDraft: "", toast: "" };
+  return { tab: "dashboard", workspaceId: "st", workspaceMenu: false, transferMenu: "", query: "", crossWorkspace: false, filters: defaultFilters(), followTab: "queue", followFilters: defaultFollowFilters(), detailRoleId: "", templateCat: "All", templateId: "", linkDraft: "", toast: "" };
 }
 
 function defaultFilters() {
@@ -1656,6 +1774,199 @@ async function exportWorkspace() {
     captures: state.captures.filter((c) => c.workspaceId === ws.id)
   };
   downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }), `talent-workbench-${slug(ws.name)}-${today()}.json`);
+}
+
+function candidateSpreadsheetRows() {
+  return state.candidates.filter((c) => c.workspaceId === activeWorkspace().id).map((candidate) => {
+    const role = roleById(candidate.roleId);
+    return {
+      name: candidate.name || "",
+      title: candidate.title || "",
+      company: candidate.company || "",
+      location: candidate.location || "",
+      roleTitle: role?.title || "",
+      roleClient: role?.client || "",
+      stage: candidate.stage || "Sourced",
+      followUp: candidate.followUp || "",
+      lastContact: candidate.lastContact || "",
+      snoozedUntil: candidate.snoozedUntil || "",
+      contactedOn: candidate.contactedOn || "",
+      touches: Number(candidate.touches || 0),
+      linkedin: candidate.linkedin || "",
+      email: candidate.email || "",
+      skills: (candidate.skills || []).join(", "),
+      links: (candidate.links || []).join(", "),
+      notes: candidate.notes || "",
+      remarks: candidate.remarks || "",
+      sequence: candidate.sequence || "",
+      archived: candidate.archived ? "Yes" : "No",
+      archivedAt: candidate.archivedAt || "",
+      closeReason: candidate.closeReason || ""
+    };
+  });
+}
+
+async function exportTabularWorkspace(format) {
+  const ws = activeWorkspace();
+  const rows = candidateSpreadsheetRows();
+  const filename = `talent-workbench-${slug(ws.name)}-candidates-${today()}.${format}`;
+  if (format === "csv") {
+    const csv = rowsToCsv(rows, CANDIDATE_SPREADSHEET_COLUMNS);
+    downloadBlob(new Blob([csv], { type: "text/csv;charset=utf-8" }), filename);
+  }
+  if (format === "xlsx") {
+    if (!window.writeXlsxFile) {
+      say("XLSX exporter failed to load");
+      return;
+    }
+    const sheetRows = [
+      CANDIDATE_SPREADSHEET_COLUMNS.map((col) => ({ value: col.label, fontWeight: "bold" })),
+      ...rows.map((row) => CANDIDATE_SPREADSHEET_COLUMNS.map((col) => ({ value: row[col.id] ?? "" })))
+    ];
+    const blob = await window.writeXlsxFile(sheetRows, { sheet: "Candidates" }).toBlob();
+    downloadBlob(blob, filename);
+  }
+  say(`${format.toUpperCase()} exported`);
+  transferDialog = null;
+  render();
+}
+
+function rowsToCsv(rows, columns) {
+  const labels = columns.map((col) => col.label);
+  const body = rows.map((row) => columns.map((col) => csvCell(row[col.id] ?? "")).join(","));
+  return `${labels.map(csvCell).join(",")}\n${body.join("\n")}`;
+}
+
+function csvCell(value) {
+  const text = String(value ?? "");
+  return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
+function mountTransferImporter() {
+  if (!transferDialog || transferDialog.mode !== "import") return;
+  const mount = document.querySelector("#hello-csv-importer");
+  if (!mount || mount.dataset.mounted === "true") return;
+  mount.dataset.mounted = "true";
+  renderImporter(mount, {
+    sheets: [CANDIDATE_SPREADSHEET_SHEET],
+    theme: "default",
+    csvDownloadMode: "label",
+    preventUploadOnValidationErrors: true,
+    allowManualDataEntry: true,
+    customFileLoaders: transferDialog.format === "xlsx" ? xlsxFileLoaders() : [],
+    customSuggestedMapper: suggestCandidateColumnMappings,
+    onComplete: importCandidatesFromHelloCsv,
+    onSummaryFinished: () => {
+      const completionToast = transferDialog?.completionToast || "";
+      transferDialog = null;
+      if (completionToast) say(completionToast);
+      else render();
+    }
+  });
+}
+
+function xlsxFileLoaders() {
+  return XLSX_IMPORT_MIME_TYPES.map((mimeType) => ({
+    mimeType,
+    label: "XLSX",
+    convert: async (_loadEvent, file) => {
+      if (!window.readXlsxFile) throw new Error("XLSX importer failed to load");
+      const rows = await window.readXlsxFile(file);
+      return { fileName: file.name, csvData: arrayRowsToCsv(rows) };
+    }
+  }));
+}
+
+function arrayRowsToCsv(rows) {
+  return rows.map((row) => row.map((value) => csvCell(value instanceof Date ? value.toISOString().slice(0, 10) : value ?? "")).join(",")).join("\n");
+}
+
+function suggestCandidateColumnMappings(sheetDefinitions, csvHeaders) {
+  const columns = sheetDefinitions.flatMap((sheet) => sheet.columns.map((column) => ({ sheet, column })));
+  return csvHeaders.map((header) => {
+    const normalizedHeader = normalize(header);
+    const match = columns.find(({ column }) => [column.id, column.label, ...(column.suggestedMappingKeywords || [])].some((keyword) => normalize(keyword) === normalizedHeader || normalizedHeader.includes(normalize(keyword))));
+    return match ? { csvColumnName: header, sheetId: match.sheet.id, sheetColumnId: match.column.id } : null;
+  }).filter(Boolean);
+}
+
+async function importCandidatesFromHelloCsv(importerState, onProgress) {
+  const sheet = importerState.sheetData.find((item) => item.sheetId === "candidates");
+  const rows = (sheet?.rows || []).filter((row) => String(row.name || "").trim());
+  const workspaceId = activeWorkspace().id;
+  let imported = 0;
+  rows.forEach((row, index) => {
+    const candidate = candidateFromImportRow(row, workspaceId);
+    const existingIndex = findExistingCandidateIndex(candidate, workspaceId);
+    if (existingIndex >= 0) {
+      state.candidates[existingIndex] = { ...state.candidates[existingIndex], ...candidate, id: state.candidates[existingIndex].id, files: state.candidates[existingIndex].files || [], updatedAt: new Date().toISOString() };
+    } else {
+      state.candidates = [candidate, ...state.candidates];
+    }
+    imported += 1;
+    onProgress?.(Math.round((index + 1) / rows.length * 100));
+  });
+  await saveState();
+  if (transferDialog) transferDialog.completionToast = `${imported} candidate${imported === 1 ? "" : "s"} imported`;
+  return { imported, failed: 0, skipped: 0 };
+}
+
+function candidateFromImportRow(row, workspaceId) {
+  const stage = STAGES.includes(row.stage) ? row.stage : "Sourced";
+  const archived = toBoolean(row.archived) || ARCHIVED_STAGES.includes(stage);
+  return {
+    id: uid("cand"),
+    workspaceId,
+    name: String(row.name || "").trim(),
+    title: String(row.title || "").trim(),
+    company: String(row.company || "").trim(),
+    location: String(row.location || "").trim(),
+    roleId: roleIdFromImportRow(row),
+    stage,
+    followUp: toDateValue(row.followUp),
+    lastContact: toDateValue(row.lastContact),
+    snoozedUntil: toDateValue(row.snoozedUntil),
+    snoozedOn: "",
+    contactedOn: toDateValue(row.contactedOn),
+    touches: Number(row.touches || 0),
+    linkedin: String(row.linkedin || "").trim(),
+    email: String(row.email || "").trim(),
+    files: [],
+    links: splitList(row.links || ""),
+    skills: splitList(row.skills || ""),
+    notes: String(row.notes || ""),
+    remarks: String(row.remarks || ""),
+    sequence: String(row.sequence || ""),
+    archived,
+    archivedAt: archived ? toDateValue(row.archivedAt) || today() : "",
+    closeReason: String(row.closeReason || row.remarks || ""),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function roleIdFromImportRow(row) {
+  const title = normalize(row.roleTitle);
+  const client = normalize(row.roleClient);
+  if (!title) return "";
+  const roles = rolesInScope({ includeArchived: true });
+  const exact = roles.find((role) => normalize(role.title) === title && (!client || normalize(role.client) === client));
+  return exact?.id || "";
+}
+
+function findExistingCandidateIndex(candidate, workspaceId) {
+  const email = normalize(candidate.email);
+  const linkedin = normalize(candidate.linkedin);
+  const nameCompany = `${normalize(candidate.name)}|${normalize(candidate.company)}`;
+  return state.candidates.findIndex((existing) => existing.workspaceId === workspaceId && (
+    (email && normalize(existing.email) === email) ||
+    (linkedin && normalize(existing.linkedin) === linkedin) ||
+    (`${normalize(existing.name)}|${normalize(existing.company)}` === nameCompany)
+  ));
+}
+
+function toBoolean(value) {
+  return ["true", "yes", "1", "y"].includes(normalize(value));
 }
 
 async function serializeCandidate(candidate) {

@@ -12,6 +12,7 @@ const KNOWN_ACTIONS = [
   "clear-profile-filters",
   "close-drawers",
   "close-template",
+  "close-transfer",
   "close-workspace",
   "contacted",
   "convert-capture",
@@ -22,12 +23,13 @@ const KNOWN_ACTIONS = [
   "dismiss-capture",
   "download-file",
   "download-first-file",
+  "download-transfer",
   "duplicate-role",
   "duplicate-template",
   "edit-candidate",
   "edit-role",
   "edit-template",
-  "export-workspace",
+  "export-json",
   "file-drop",
   "follow-tab",
   "import-workspace",
@@ -36,6 +38,8 @@ const KNOWN_ACTIONS = [
   "new-role",
   "new-template",
   "new-workspace",
+  "open-export",
+  "open-import",
   "pick-palette",
   "rank-role",
   "remove-file",
@@ -49,6 +53,7 @@ const KNOWN_ACTIONS = [
   "switch-workspace",
   "tab",
   "template-cat",
+  "toggle-transfer-menu",
   "toggle-cross-search",
   "workspace-menu"
 ];
@@ -253,6 +258,27 @@ test("rendered action controls are registered and key buttons respond", async ({
     await collectActions();
   }
 
+  await page.locator('button[data-action="toggle-transfer-menu"][data-menu="export"]').click();
+  await collectActions();
+  await expect(page.getByRole("button", { name: "Export as JSON" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Export as CSV" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Export as XLSX" })).toBeVisible();
+  await page.locator('button[data-action="open-export"][data-format="csv"]').click();
+  await collectActions();
+  await expect(page.locator(".transfer-dialog")).toContainText("Export CSV");
+  await page.locator('button[data-action="close-transfer"]').click();
+
+  await page.locator('button[data-action="toggle-transfer-menu"][data-menu="import"]').click();
+  await collectActions();
+  await expect(page.getByText("Import JSON")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Import CSV" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Import XLSX" })).toBeVisible();
+  await page.locator('button[data-action="open-import"][data-format="csv"]').click();
+  await collectActions();
+  await expect(page.locator(".transfer-dialog")).toContainText("Import CSV");
+  await expect(page.locator(".hello-csv-frame")).toBeVisible();
+  await page.locator('button[data-action="close-transfer"]').click();
+
   await page.locator(".workspace-pill").click();
   await collectActions();
   await page.getByRole("button", { name: /Search all workspaces/ }).click();
@@ -303,7 +329,7 @@ test("rendered action controls are registered and key buttons respond", async ({
 
   const unknown = [...seen].filter((action) => !KNOWN_ACTIONS.includes(action)).sort();
   expect(unknown).toEqual([]);
-  expect([...seen]).toEqual(expect.arrayContaining(["workspace-menu", "switch-workspace", "pick-palette", "duplicate-role", "rank-role", "edit-candidate", "copy-follow-section", "copy-template", "duplicate-template", "copy-bookmarklet"]));
+  expect([...seen]).toEqual(expect.arrayContaining(["workspace-menu", "switch-workspace", "pick-palette", "toggle-transfer-menu", "open-export", "open-import", "download-transfer", "duplicate-role", "rank-role", "edit-candidate", "copy-follow-section", "copy-template", "duplicate-template", "copy-bookmarklet"]));
 });
 
 test("role, candidate, follow-up, archive, template, capture, workspace and import/export flow", async ({ page }) => {
@@ -373,15 +399,42 @@ test("role, candidate, follow-up, archive, template, capture, workspace and impo
 
   const [download] = await Promise.all([
     page.waitForEvent("download"),
-    page.getByRole("button", { name: /Export/ }).click()
+    exportByMenu(page, "Export as JSON")
   ]);
   expect(download.suggestedFilename()).toMatch(/talent-workbench-.*\.json/);
+
+  await page.locator('button[data-action="toggle-transfer-menu"][data-menu="export"]').click();
+  await page.locator('button[data-action="open-export"][data-format="csv"]').click();
+  await expect(page.locator(".transfer-dialog")).toContainText("Export CSV");
+  await expect(page.locator(".transfer-columns")).toContainText("Name");
+  await expect(page.locator(".transfer-columns")).toContainText("Follow-up");
+  const [csvDownload] = await Promise.all([
+    page.waitForEvent("download"),
+    page.locator('button[data-action="download-transfer"][data-format="csv"]').click()
+  ]);
+  expect(csvDownload.suggestedFilename()).toMatch(/talent-workbench-.*-candidates-.*\.csv/);
+
+  await page.locator('button[data-action="toggle-transfer-menu"][data-menu="export"]').click();
+  await page.locator('button[data-action="open-export"][data-format="xlsx"]').click();
+  await expect(page.locator(".transfer-dialog")).toContainText("Export XLSX");
+  const [xlsxDownload] = await Promise.all([
+    page.waitForEvent("download"),
+    page.locator('button[data-action="download-transfer"][data-format="xlsx"]').click()
+  ]);
+  expect(xlsxDownload.suggestedFilename()).toMatch(/talent-workbench-.*-candidates-.*\.xlsx/);
+
+  await page.locator('button[data-action="toggle-transfer-menu"][data-menu="import"]').click();
+  await page.locator('button[data-action="open-import"][data-format="csv"]').click();
+  await expect(page.locator(".transfer-dialog")).toContainText("Import CSV");
+  await expect(page.locator(".hello-csv-frame")).toBeVisible();
+  await page.locator('button[data-action="close-transfer"]').click();
 
   const exportPath = join(test.info().outputDir, "workspace-export.json");
   await download.saveAs(exportPath);
   const exported = JSON.parse(readFileSync(exportPath, "utf8")) as { workspace: { name: string } };
   exported.workspace.name = "Imported QA Workspace";
   writeFileSync(exportPath, JSON.stringify(exported));
+  await page.locator('button[data-action="toggle-transfer-menu"][data-menu="import"]').click();
   await page.locator('input[data-action="import-workspace"]').setInputFiles(exportPath);
   await expect(page.locator(".topbar .kicker")).toContainText("Imported QA Workspace");
 
@@ -393,6 +446,43 @@ test("role, candidate, follow-up, archive, template, capture, workspace and impo
   await page.locator('form[data-form="workspace"] button[type="submit"]').click();
   await expect(page.locator(".topbar .kicker")).toContainText("Palette QA");
   await expect(page.locator(".workspace-mark").last()).toHaveText("PQ");
+});
+
+test("CSV import uses HelloCSV mapping and saves candidates", async ({ page }) => {
+  test.skip(test.info().project.name !== "chromium-desktop", "Importer walkthrough is covered once on desktop; responsive shell coverage is separated.");
+  await page.goto("/");
+
+  await page.locator('button[data-action="toggle-transfer-menu"][data-menu="import"]').click();
+  await page.locator('button[data-action="open-import"][data-format="csv"]').click();
+  await expect(page.locator(".transfer-dialog")).toContainText("Import CSV");
+  await expect(page.locator(".hello-csv-frame")).toBeVisible();
+
+  const csv = [
+    "Candidate Name,Current Title,Employer,City Country,Email Address,Pipeline Stage,Skill List",
+    'HelloCSV Import,Recruiting Engineer,Column Labs,"Toronto, Canada",hellocsv@example.com,Sourced,"Rust, Search"'
+  ].join("\n");
+  await page.locator(".hello-csv-frame input[type=file]").setInputFiles({
+    name: "candidate-import.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(csv)
+  });
+
+  await expect(page.locator(".hello-csv-frame")).toContainText("Review and confirm each mapping");
+  await expect(page.locator(".hello-csv-frame")).toContainText("Candidate Name");
+  await expect(page.locator(".hello-csv-frame")).toContainText("Name");
+  await page.getByRole("button", { name: "Confirm" }).click();
+
+  await expect(page.locator(".hello-csv-frame")).toContainText("Valid (1)");
+  await expect(page.locator(".hello-csv-frame")).toContainText("HelloCSV Import");
+  await page.getByRole("button", { name: "Upload" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.locator(".transfer-dialog")).toHaveCount(0);
+  await expect(page.getByText("1 candidate imported")).toBeVisible();
+
+  await page.getByRole("button", { name: /Profiles/ }).click();
+  await expect(candidateTitle(page, "HelloCSV Import")).toBeVisible();
+  await expect(page.getByText("Recruiting Engineer · Column Labs")).toBeVisible();
+  await expect(page.getByText("Toronto, Canada")).toBeVisible();
 });
 
 test("native date inputs and resume/link handling stay wired in drawers", async ({ page }) => {
@@ -529,4 +619,9 @@ async function createCandidate(page: Page, name: string) {
 
 function candidateTitle(page: Page, name: string): Locator {
   return page.locator(".candidate-title", { hasText: name }).first();
+}
+
+async function exportByMenu(page: Page, label: string) {
+  await page.locator('button[data-action="toggle-transfer-menu"][data-menu="export"]').click();
+  await page.getByRole("button", { name: label }).click();
 }

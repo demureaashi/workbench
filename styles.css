@@ -352,6 +352,46 @@ h1 {
   gap: 8px;
 }
 
+.transfer-wrap {
+  position: relative;
+}
+
+.transfer-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 7px);
+  z-index: 40;
+  min-width: 158px;
+  padding: 6px;
+  border: 1px solid var(--color-divider);
+  border-radius: 10px;
+  background: var(--color-bg);
+  box-shadow: var(--shadow-md);
+}
+
+.transfer-menu button,
+.transfer-menu label {
+  display: flex;
+  width: 100%;
+  min-height: 30px;
+  align-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12.5px;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.transfer-menu button:hover,
+.transfer-menu label:hover {
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+
 .search-wrap {
   position: relative;
   display: flex;
@@ -1299,6 +1339,74 @@ textarea.input {
   margin-bottom: 12px;
 }
 
+.transfer-dialog {
+  width: min(980px, 100%);
+}
+
+.transfer-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.transfer-summary div {
+  border: 1px solid var(--color-divider);
+  border-radius: 8px;
+  padding: 9px 10px;
+}
+
+.transfer-summary b,
+.transfer-summary span {
+  display: block;
+}
+
+.transfer-summary b {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.transfer-summary span {
+  margin-top: 2px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  font-size: 11.5px;
+}
+
+.transfer-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.transfer-preview {
+  max-height: 260px;
+}
+
+.hello-csv-frame {
+  min-height: 520px;
+  margin-top: 14px;
+  border: 1px solid var(--color-divider);
+  border-radius: 10px;
+  background: #fff;
+  overflow: auto;
+}
+
+.hello-csv-frame * {
+  font-family: var(--font-body);
+}
+
+.hello-csv-frame h1,
+.hello-csv-frame h2,
+.hello-csv-frame h3 {
+  font-family: var(--font-heading);
+  letter-spacing: 0;
+}
+
+.hello-csv-frame button {
+  border-radius: 999px;
+}
+
 .palette-row {
   display: flex;
   flex-wrap: wrap;
@@ -1638,6 +1746,17 @@ textarea.input {
     width: 100%;
   }
 
+  .transfer-wrap,
+  .transfer-wrap .btn {
+    width: 100%;
+  }
+
+  .transfer-menu {
+    position: static;
+    margin-top: 6px;
+    box-shadow: none;
+  }
+
   .content,
   .main {
     overflow: visible;
@@ -1686,5 +1805,9 @@ textarea.input {
   .capture-pair {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .transfer-summary {
+    grid-template-columns: 1fr;
   }
 }
