@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Talent Workbench Capture</title>
+  </head>
+  <body>
+    <script>
+      window.TALENT_WORKBENCH_CONFIG = window.TALENT_WORKBENCH_CONFIG || {
+        supabaseUrl: "",
+        supabaseAnonKey: "",
+        supabaseStorageBucket: "candidate-files"
+      };
+    </script>
+    <script src="./config.js?v=51"></script>
+    <script>
+      (async function () {
+        function reply(ok, message) {
+          parent.postMessage({ type: "talent:capture:stored", ok, message: message || "" }, "*");
+        }
+
+        try {
+          const hash = new URLSearchParams(location.hash.replace(/^#/, ""));
+          const payload = JSON.parse(hash.get("payload") || "{}");
+          const config = window.TALENT_WORKBENCH_CONFIG || {};
+          if (!config.supabaseUrl || !config.supabaseAnonKey) throw new Error("Supabase is not configured");
+          const response = await fetch(config.supabaseUrl.replace(/\/+$/, "") + "/rest/v1/capture_drops", {
+            method: "POST",
+            headers: {
+              apikey: config.supabaseAnonKey,
+              authorization: "Bearer " + config.supabaseAnonKey,
+              "content-type": "application/json",
+              prefer: "return=minimal"
+            },
+            body: JSON.stringify(payload)
+          });
+          if (!response.ok) throw new Error("Capture request failed");
+          reply(true);
+        } catch (error) {
+          reply(false, error.message || "Capture failed");
+        }
+      })();
+    </script>
+  </body>
+</html>

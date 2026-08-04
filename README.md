@@ -36,7 +36,7 @@ No candidate or role mock data is loaded by default. Use the empty-state button 
 
 ## Capture from webpages
 
-Open the `Capture` tab and copy the bookmarklet. Keep Talent Workbench open once. On any profile page, select useful text and click the bookmarklet; the open Workbench tab receives the page title, URL, selected text, email clues, and LinkedIn URL without opening a new dashboard tab.
+Open the `Capture` tab and copy the bookmarklet. On any profile page, select useful text and click the bookmarklet; it saves the page title, URL, selected text, email clues, and LinkedIn URL to Supabase without opening or focusing Workbench. Review the captures later from the `Capture` tab after signing in and syncing.
 
 ## Data
 

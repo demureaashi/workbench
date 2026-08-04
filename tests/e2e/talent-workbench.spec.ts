@@ -339,7 +339,7 @@ test("rendered action controls are registered and key buttons respond", async ({
 });
 
 test("Supabase config enables cloud sign-in without leaking secrets to tests", async ({ page }) => {
-  await page.route("**/config.js?v=50", async (route) => {
+  await page.route("**/config.js?v=51", async (route) => {
     await route.fulfill({
       contentType: "application/javascript",
       body: 'window.TALENT_WORKBENCH_CONFIG = { supabaseUrl: "https://example.supabase.co", supabaseAnonKey: "test-publishable-key", supabaseStorageBucket: "candidate-files" };'
@@ -356,6 +356,26 @@ test("Supabase config enables cloud sign-in without leaking secrets to tests", a
   await page.locator('form[data-form="auth"] input[name="email"]').fill("operator@example.com");
   await page.locator('form[data-form="auth"] button[type="submit"]').click();
   await expect(page.getByText("Magic link sent")).toBeVisible();
+});
+
+test("drawers and dialogs do not close from inert inside clicks", async ({ page }) => {
+  await page.goto("/?seed=1");
+
+  await page.getByRole("button", { name: /Profiles/ }).click();
+  await page.locator('button[data-action="edit-candidate"]').first().click();
+  await expect(page.locator("[data-drawer]")).toBeVisible();
+  await page.locator(".drawer-subtitle").click();
+  await expect(page.locator("[data-drawer]")).toBeVisible();
+  await page.locator(".drawer-backdrop").click({ position: { x: 6, y: 6 } });
+  await expect(page.locator("[data-drawer]")).toHaveCount(0);
+
+  await page.locator('button[data-action="toggle-transfer-menu"][data-menu="export"]').click();
+  await page.locator('button[data-action="open-export"][data-format="csv"]').click();
+  await expect(page.locator(".transfer-dialog")).toBeVisible();
+  await page.locator(".transfer-copy").click();
+  await expect(page.locator(".transfer-dialog")).toBeVisible();
+  await page.locator(".dialog-backdrop").click({ position: { x: 6, y: 6 } });
+  await expect(page.locator(".transfer-dialog")).toHaveCount(0);
 });
 
 test("role, candidate, follow-up, archive, template, capture, workspace and import/export flow", async ({ page }) => {
@@ -404,11 +424,12 @@ test("role, candidate, follow-up, archive, template, capture, workspace and impo
   await expect(page.getByText("Command-based capture")).toBeVisible();
   const captureBookmarklet = page.getByRole("link", { name: "⌘ Send to Workbench" });
   await expect(captureBookmarklet).toBeVisible();
-  await expect(captureBookmarklet).toHaveAttribute("href", /javascript:.*talentWorkbenchCapture/);
-  await expect(captureBookmarklet).toHaveAttribute("href", /capture=1/);
-  await expect(captureBookmarklet).toHaveAttribute("href", /linkedinUrl/);
+  await expect(captureBookmarklet).toHaveAttribute("href", /javascript:.*capture_drops/);
+  await expect(captureBookmarklet).toHaveAttribute("href", /capture-drop\.html/);
+  await expect(captureBookmarklet).toHaveAttribute("href", /linkedin_url/);
+  await expect(captureBookmarklet).not.toHaveAttribute("href", /window\.open/);
   await expect(captureBookmarklet).not.toHaveAttribute("href", /Open Talent Workbench once/);
-  expect(await captureBookmarklet.getAttribute("href")).toContain(encodeURIComponent(new URL(page.url()).origin));
+  expect(await captureBookmarklet.getAttribute("href")).toContain(new URL("./capture-drop.html", page.url()).href);
   await expect(page.locator(".code-box")).toHaveCount(0);
   await page.evaluate(() => {
     window.postMessage({
@@ -491,10 +512,11 @@ test("capture fallback URL lands directly in the active workspace inbox", async 
 test("standalone capture setup generates a deployment-scoped bookmarklet", async ({ page }) => {
   await page.goto("/capture-setup.html");
   const bookmark = page.locator("#bookmark");
-  await expect(bookmark).toHaveAttribute("href", /javascript:.*talentWorkbenchCapture/);
-  await expect(bookmark).toHaveAttribute("href", /capture=1/);
-  await expect(bookmark).toHaveAttribute("href", /linkedinUrl/);
-  expect(await bookmark.getAttribute("href")).toContain(encodeURIComponent(new URL(page.url()).origin));
+  await expect(bookmark).toHaveAttribute("href", /javascript:.*capture_drops/);
+  await expect(bookmark).toHaveAttribute("href", /capture-drop\.html/);
+  await expect(bookmark).toHaveAttribute("href", /linkedin_url/);
+  await expect(bookmark).not.toHaveAttribute("href", /window\.open/);
+  expect(await bookmark.getAttribute("href")).toContain(new URL("./capture-drop.html", page.url()).href);
 });
 
 test("CSV import uses HelloCSV mapping and saves candidates", async ({ page }) => {

@@ -32,7 +32,7 @@ jobs:
           VITE_SUPABASE_STORAGE_BUCKET: ${{ vars.VITE_SUPABASE_STORAGE_BUCKET || 'candidate-files' }}
         run: |
           mkdir -p _site
-          cp index.html app.js styles.css sw.js manifest.webmanifest capture-setup.html CNAME .nojekyll _site/
+          cp index.html app.js styles.css sw.js manifest.webmanifest capture-setup.html capture-drop.html CNAME .nojekyll _site/
           cp -R fonts vendor _site/
           node -e 'const fs=require("fs"); const cfg={supabaseUrl:process.env.VITE_SUPABASE_URL||"",supabaseAnonKey:process.env.VITE_SUPABASE_ANON_KEY||"",supabaseStorageBucket:process.env.VITE_SUPABASE_STORAGE_BUCKET||"candidate-files"}; fs.writeFileSync("_site/config.js","window.TALENT_WORKBENCH_CONFIG = "+JSON.stringify(cfg,null,2)+";\n");'
 

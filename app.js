@@ -77,6 +77,8 @@ const CANDIDATE_SPREADSHEET_SHEET = {
 
 const CLOUD_CONFIG = window.TALENT_WORKBENCH_CONFIG || {};
 const CLOUD_BUCKET = CLOUD_CONFIG.supabaseStorageBucket || "candidate-files";
+const CLOUD_URL = String(CLOUD_CONFIG.supabaseUrl || "").replace(/\/+$/, "");
+const CLOUD_KEY = CLOUD_CONFIG.supabaseAnonKey || "";
 
 const NAV = [
   ["dashboard", "Dashboard", "dashboard"],
@@ -800,14 +802,14 @@ function renderCapture() {
       <div class="capture-setup">
         <div class="capture-setup-copy">
           <div class="capture-setup-title">Command-based capture</div>
-          <div class="capture-setup-note">Nothing is recorded until you press the bookmarklet. It sends title, URL, selected text, email clues and LinkedIn URL into this tab - never a new one.</div>
+          <div class="capture-setup-note">Nothing is recorded until you press the bookmarklet. It saves title, URL, selected text, email clues and LinkedIn URL to the capture database without opening Workbench.</div>
         </div>
         <a class="capture-bookmarklet" href="${escapeAttr(bookmarklet)}" data-action="copy-bookmarklet" draggable="true" title="Drag to bookmarks bar or click to copy">⌘ Send to Workbench</a>
       </div>
       <div class="capture-workbench">
         <section class="capture-inbox">
           <div class="capture-title-line"><h4>Inbox</h4><span>${captures.length} awaiting review</span></div>
-          ${captures.map((c) => renderCaptureRow(c, selected)).join("") || emptyBlock("No captured pages", "Use the bookmarklet when you want to send a page into the open Workbench tab.", "")}
+          ${captures.map((c) => renderCaptureRow(c, selected)).join("") || emptyBlock("No captured pages", "Use the bookmarklet when you want to save a page for later review without leaving your current tab.", "")}
         </section>
         <aside class="capture-review">
           <div class="capture-review-label">Review · convert to candidate</div>
@@ -1108,6 +1110,8 @@ async function handleClick(event) {
   if (drawer) event.stopPropagation();
   const el = event.target.closest("[data-action]");
   if (!el) return;
+  const backdropClose = (el.classList.contains("dialog-backdrop") || el.classList.contains("drawer-backdrop")) && String(el.dataset.action || "").startsWith("close-");
+  if (backdropClose && event.target !== el) return;
   if (drawer && !drawer.contains(el)) return;
   const action = el.dataset.action;
   const id = el.dataset.id;
@@ -1234,7 +1238,10 @@ async function handleClick(event) {
     render();
   }
   if (action === "convert-capture") await convertCapture(id);
-  if (action === "dismiss-capture") await patchCapture(id, { dismissedAt: new Date().toISOString() });
+  if (action === "dismiss-capture") {
+    await markCaptureDropReviewed(state.captures.find((c) => c.id === id));
+    await patchCapture(id, { dismissedAt: new Date().toISOString() });
+  }
   if (action === "copy-bookmarklet") {
     event.preventDefault();
     copyText(buildBookmarklet());
@@ -1538,6 +1545,7 @@ async function convertCapture(id) {
   state.candidates = [candidate, ...state.candidates];
   state.captures = state.captures.filter((c) => c.id !== id);
   selectedCaptureId = "";
+  await markCaptureDropReviewed(cap);
   await saveState();
   say(`${candidate.name} created as a candidate`);
   render();
@@ -2100,14 +2108,15 @@ function compactError(text) {
 }
 
 async function loadCloudState() {
-  const [workspaces, roles, candidates, links, files, templates, captures] = await Promise.all([
+  const [workspaces, roles, candidates, links, files, templates, captures, captureDrops] = await Promise.all([
     restSelect("workspaces", "order=created_at.asc"),
     restSelect("roles", "order=created_at.asc"),
     restSelect("candidates", "order=created_at.asc"),
     restSelect("candidate_links", "order=position.asc"),
     restSelect("candidate_files", "order=created_at.asc"),
     restSelect("templates", "order=created_at.asc"),
-    restSelect("captures", "order=created_at.desc")
+    restSelect("captures", "order=created_at.desc"),
+    restSelect("capture_drops", "status=eq.pending&order=created_at.desc")
   ]);
   const linksByCandidate = groupBy(links, "candidate_id");
   const filesByCandidate = groupBy(files, "candidate_id");
@@ -2116,7 +2125,7 @@ async function loadCloudState() {
     roles: roles.map(roleFromCloud),
     candidates: candidates.map((candidate) => candidateFromCloud(candidate, linksByCandidate.get(candidate.id) || [], filesByCandidate.get(candidate.id) || [])),
     templates: templates.map(templateFromCloud),
-    captures: captures.map(captureFromCloud)
+    captures: mergeRecords(captures.map(captureFromCloud), captureDrops.map(captureDropFromCloud))
   });
 }
 
@@ -2163,6 +2172,14 @@ async function restDelete(table, query) {
   await supabaseFetch(`/rest/v1/${table}?${query}`, {
     method: "DELETE",
     headers: { prefer: "return=minimal" }
+  }, true, false);
+}
+
+async function restPatch(table, query, patch) {
+  await supabaseFetch(`/rest/v1/${table}?${query}`, {
+    method: "PATCH",
+    headers: { prefer: "return=minimal" },
+    body: JSON.stringify(patch)
   }, true, false);
 }
 
@@ -2458,6 +2475,45 @@ function captureFromCloud(row) {
     notes: row.snippet,
     dismissedAt: row.dismissed_at || (row.dismissed ? row.updated_at : "")
   };
+}
+
+function captureDropFromCloud(row) {
+  const emailText = [row.email_clues, row.snippet, row.title].filter(Boolean).join(" ");
+  const email = String(emailText).match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0] || "";
+  const parsed = parseCapturePayload({
+    title: row.title,
+    url: row.url,
+    linkedinUrl: row.linkedin_url
+  }, row.snippet || "");
+  return {
+    id: row.id,
+    captureDropId: row.id,
+    workspaceId: row.workspace_id || activeWorkspaceSafe(state).id,
+    source: row.source || sourceFromUrl(row.url),
+    title: row.title || "",
+    url: row.url || "",
+    when: row.captured_when || row.created_at,
+    snippet: row.snippet || "",
+    name: parsed.name,
+    parsedTitle: parsed.title,
+    company: parsed.company,
+    location: parsed.location,
+    email,
+    linkedinUrl: row.linkedin_url || (String(row.url || "").includes("linkedin.com") ? row.url : ""),
+    link: row.url || "",
+    roleId: "",
+    notes: row.snippet || ""
+  };
+}
+
+async function markCaptureDropReviewed(capture) {
+  if (!cloud.session || !capture?.captureDropId) return;
+  try {
+    await restPatch("capture_drops", `id=eq.${encodeURIComponent(capture.captureDropId)}`, { status: "reviewed", reviewed_at: new Date().toISOString() });
+  } catch (error) {
+    cloud.status = "error";
+    cloud.message = error.message || "Capture review sync failed";
+  }
 }
 
 function mergeStates(localState, cloudState) {
@@ -2926,10 +2982,9 @@ function parseCapturePayload(payload, text) {
 }
 
 function buildBookmarklet() {
-  const origin = location.origin;
-  const appUrl = new URL(location.pathname || "/", location.origin).href;
-  const name = captureWindowName(origin);
-  const code = `(function(){var s=String(window.getSelection&&window.getSelection()||'').slice(0,4000);var emails=Array.from(document.body.innerText.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,}/ig)).slice(0,5).map(function(m){return m[0]});var linked=location.href.indexOf('linkedin.com')>-1?location.href:'';var p={type:'talent:capture',title:document.title,url:location.href,selection:s,emailClues:emails,linkedinUrl:linked};var q='capture=1&title='+encodeURIComponent(p.title)+'&url='+encodeURIComponent(p.url)+'&text='+encodeURIComponent(p.selection)+'&emailClues='+encodeURIComponent(emails.join(' '))+'&linkedinUrl='+encodeURIComponent(linked);var target='${appUrl}?'+q;var w=window.open('', '${name}');if(!w||w.closed){window.open(target,'${name}');return;}try{if(w.location.href==='about:blank'){w.location.href=target;return;}}catch(e){}w.postMessage(p,'${origin}');})();`;
+  const dropUrl = new URL("./capture-drop.html", location.href).href;
+  const workspaceId = activeWorkspace().id;
+  const code = `(function(){var U=${JSON.stringify(CLOUD_URL)},K=${JSON.stringify(CLOUD_KEY)},D=${JSON.stringify(dropUrl)},W=${JSON.stringify(workspaceId)};function id(){return'cap_'+(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));}function note(t,b){var n=document.getElementById('tw-capture-note');if(!n){n=document.createElement('div');n.id='tw-capture-note';n.style.cssText='position:fixed;right:18px;bottom:18px;z-index:2147483647;background:#24180f;color:#f8d94d;border:1px solid #d9ccb5;border-radius:999px;padding:9px 13px;font:700 13px system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.18)';document.body.appendChild(n);}n.textContent=t;clearTimeout(n._t);n._t=setTimeout(function(){n.remove()},b?5200:2200);}var s=String(window.getSelection&&window.getSelection()||'').slice(0,4000);var text=document.body&&document.body.innerText||'';var emails=Array.from(text.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,}/ig)).slice(0,5).map(function(m){return m[0]});var linked=location.href.indexOf('linkedin.com')>-1?location.href:'';var p={id:id(),workspace_id:W,source:linked?'LinkedIn':'Web',title:document.title,url:location.href,captured_when:new Date().toISOString(),snippet:s,email_clues:emails.join(' '),linkedin_url:linked,status:'pending'};function frame(){var f=document.createElement('iframe');f.style.cssText='position:fixed;left:-20px;bottom:-20px;width:1px;height:1px;opacity:0;pointer-events:none;border:0';var done=false;function on(e){if(!e.data||e.data.type!=='talent:capture:stored')return;done=true;window.removeEventListener('message',on);note(e.data.ok?'Saved to Workbench':'Capture failed',!e.data.ok);setTimeout(function(){f.remove()},500);}window.addEventListener('message',on);f.src=D+'#payload='+encodeURIComponent(JSON.stringify(p));document.body.appendChild(f);setTimeout(function(){if(!done)note('Capture queued. Open Workbench later to review.',true)},2600);}if(U&&K){fetch(U+'/rest/v1/capture_drops',{method:'POST',headers:{apikey:K,authorization:'Bearer '+K,'content-type':'application/json',prefer:'return=minimal'},body:JSON.stringify(p),keepalive:true}).then(function(r){if(r.ok)note('Saved to Workbench');else frame();}).catch(frame);}else frame();})();`;
   return `javascript:${code}`;
 }
 

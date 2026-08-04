@@ -92,7 +92,7 @@
           <li>Drag the dark button into that bookmarks bar.</li>
           <li>Open a LinkedIn/profile page.</li>
           <li>Select useful text, then click your new bookmark.</li>
-          <li>Your existing Workbench tab will update in the background, and the page will appear in Capture ready for <strong>Create profile</strong>.</li>
+          <li>The page is saved to the Workbench capture database without opening or focusing Workbench.</li>
         </ol>
       </section>
       <section class="card">
@@ -101,10 +101,19 @@
       </section>
     </main>
     <script>
-      const appUrl = new URL("./index.html", location.href).href;
-      const origin = new URL(appUrl).origin;
-      const windowName = "talentWorkbenchCapture:" + encodeURIComponent(origin);
-      const bookmarklet = "javascript:(function(){var s=String(window.getSelection&&window.getSelection()||'').slice(0,4000);var emails=Array.from(document.body.innerText.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,}/ig)).slice(0,5).map(function(m){return m[0]});var linked=location.href.indexOf('linkedin.com')>-1?location.href:'';var p={type:'talent:capture',title:document.title,url:location.href,selection:s,emailClues:emails,linkedinUrl:linked};var q='capture=1&title='+encodeURIComponent(p.title)+'&url='+encodeURIComponent(p.url)+'&text='+encodeURIComponent(p.selection)+'&emailClues='+encodeURIComponent(emails.join(' '))+'&linkedinUrl='+encodeURIComponent(linked);var target='" + appUrl + "?'+q;var w=window.open('', '" + windowName + "');if(!w||w.closed){window.open(target,'" + windowName + "');return;}try{if(w.location.href==='about:blank'){w.location.href=target;return;}}catch(e){}w.postMessage(p,'" + origin + "');})();";
+      window.TALENT_WORKBENCH_CONFIG = window.TALENT_WORKBENCH_CONFIG || {
+        supabaseUrl: "",
+        supabaseAnonKey: "",
+        supabaseStorageBucket: "candidate-files"
+      };
+    </script>
+    <script src="./config.js?v=51"></script>
+    <script>
+      const dropUrl = new URL("./capture-drop.html", location.href).href;
+      const config = window.TALENT_WORKBENCH_CONFIG || {};
+      const supabaseUrl = String(config.supabaseUrl || "").replace(/\/+$/, "");
+      const supabaseKey = config.supabaseAnonKey || "";
+      const bookmarklet = "javascript:(function(){var U=" + JSON.stringify(supabaseUrl) + ",K=" + JSON.stringify(supabaseKey) + ",D=" + JSON.stringify(dropUrl) + ",W='st';function id(){return'cap_'+(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));}function note(t,b){var n=document.getElementById('tw-capture-note');if(!n){n=document.createElement('div');n.id='tw-capture-note';n.style.cssText='position:fixed;right:18px;bottom:18px;z-index:2147483647;background:#24180f;color:#f8d94d;border:1px solid #d9ccb5;border-radius:999px;padding:9px 13px;font:700 13px system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.18)';document.body.appendChild(n);}n.textContent=t;clearTimeout(n._t);n._t=setTimeout(function(){n.remove()},b?5200:2200);}var s=String(window.getSelection&&window.getSelection()||'').slice(0,4000);var text=document.body&&document.body.innerText||'';var emails=Array.from(text.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,}/ig)).slice(0,5).map(function(m){return m[0]});var linked=location.href.indexOf('linkedin.com')>-1?location.href:'';var p={id:id(),workspace_id:W,source:linked?'LinkedIn':'Web',title:document.title,url:location.href,captured_when:new Date().toISOString(),snippet:s,email_clues:emails.join(' '),linkedin_url:linked,status:'pending'};function frame(){var f=document.createElement('iframe');f.style.cssText='position:fixed;left:-20px;bottom:-20px;width:1px;height:1px;opacity:0;pointer-events:none;border:0';var done=false;function on(e){if(!e.data||e.data.type!=='talent:capture:stored')return;done=true;window.removeEventListener('message',on);note(e.data.ok?'Saved to Workbench':'Capture failed',!e.data.ok);setTimeout(function(){f.remove()},500);}window.addEventListener('message',on);f.src=D+'#payload='+encodeURIComponent(JSON.stringify(p));document.body.appendChild(f);setTimeout(function(){if(!done)note('Capture queued. Open Workbench later to review.',true)},2600);}if(U&&K){fetch(U+'/rest/v1/capture_drops',{method:'POST',headers:{apikey:K,authorization:'Bearer '+K,'content-type':'application/json',prefer:'return=minimal'},body:JSON.stringify(p),keepalive:true}).then(function(r){if(r.ok)note('Saved to Workbench');else frame();}).catch(frame);}else frame();})();";
       document.querySelector("#bookmark").href = bookmarklet;
       document.querySelector("#code").textContent = bookmarklet;
     </script>
