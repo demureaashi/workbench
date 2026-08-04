@@ -229,7 +229,7 @@ function renderRail(ws) {
           <span class="brand-tile">TW</span>
           <strong>Talent Workbench</strong>
         </div>
-        <div class="rail-url">talent.akankshaps.com</div>
+        <div class="rail-url">workbench.akankshaps.com</div>
       </div>
       <nav class="nav tw-scroll">
         ${NAV.map(([key, label, iconName]) => `

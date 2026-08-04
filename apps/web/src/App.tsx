@@ -114,7 +114,7 @@ export function App() {
               <span className="brand-tile">TW</span>
               <strong>Talent Workbench</strong>
             </div>
-            <div className="rail-url">talent.akankshaps.com</div>
+            <div className="rail-url">workbench.akankshaps.com</div>
           </div>
           <nav className="nav tw-scroll">
             {NAV.map(([key, label, iconName]) => (

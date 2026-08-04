@@ -1,6 +1,6 @@
 # Talent Workbench
 
-Offline-first personal recruiting OS for `talent.akankshaps.com`.
+Offline-first personal recruiting OS for `workbench.akankshaps.com`.
 
 The shipped app starts with a single empty `Superteam Talent` workspace and stores records, workspace data, and resume blobs in IndexedDB. UI state such as the active workspace, tab, and filters is stored in `localStorage`.
 
