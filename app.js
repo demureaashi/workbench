@@ -2116,7 +2116,7 @@ async function loadCloudState() {
     restSelect("candidate_files", "order=created_at.asc"),
     restSelect("templates", "order=created_at.asc"),
     restSelect("captures", "order=created_at.desc"),
-    restSelect("capture_drops", "status=eq.pending&order=created_at.desc")
+    safeRestSelect("capture_drops", "status=eq.pending&order=created_at.desc")
   ]);
   const linksByCandidate = groupBy(links, "candidate_id");
   const filesByCandidate = groupBy(files, "candidate_id");
@@ -2166,6 +2166,15 @@ async function replaceWorkspaceRows(workspaceId, snapshot) {
 async function restSelect(table, query = "") {
   const suffix = query ? `&${query}` : "";
   return supabaseFetch(`/rest/v1/${table}?select=*${suffix}`, { headers: { accept: "application/json" } });
+}
+
+async function safeRestSelect(table, query = "") {
+  try {
+    return await restSelect(table, query);
+  } catch (error) {
+    if (String(error.message || "").includes("capture_drops")) return [];
+    throw error;
+  }
 }
 
 async function restDelete(table, query) {
